@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>希少になる情報、共生するテキスト生成 — 印刷革命から AI 時代への類推</title>
+<meta name="description" content="HTP-DB と SI-Framework / CDH を横断し、印刷革命で何が陳腐化し何が希少化したかを抽出。AI 時代の量爆発期に何が希少化するかを歴史類推で検証する補論">
+<link rel="icon" href="https://esse-sense.com/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&family=Fira+Code&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FFFFFF; --card:#FFFFFF; --card-hover:#F7F7F5;
+  --accent:#121212; --accent-soft:#555555; --accent-warm:#CC1400; --accent-warm-soft:#B01200;
+  --accent-muted:rgba(204,20,0,0.06);
+  --text:#121212; --text-secondary:#555555; --text-muted:#6B6B6B;
+  --border:#D9D9D9; --border-light:#EEEEEE; --highlight:#CC1400; --surface:#F7F7F5;
+  --font:"Noto Sans JP","Hiragino Sans",-apple-system,sans-serif;
+  --font-serif:"Noto Serif JP","Hiragino Mincho ProN",Georgia,serif;
+  --font-mono:"Fira Code","SF Mono",monospace;
+}
+[data-theme="dark"] {
+  --bg:#121212; --card:#1A1A1A; --card-hover:#222222;
+  --accent:#E0E0E0; --accent-warm:#FF4030; --accent-muted:rgba(255,64,48,0.10);
+  --text:#E0E0E0; --text-secondary:#AAAAAA; --text-muted:#8A8A8A;
+  --border:#333333; --border-light:#2A2A2A; --highlight:#FF4030; --surface:#1A1A1A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { background:var(--bg); color:var(--text); font-family:var(--font); }
+body { line-height:1.95; letter-spacing:0.025em; font-feature-settings:"palt"; }
+
+.top-bar { position:fixed; top:0; left:0; right:0; height:48px; background:var(--bg); border-top:3px solid var(--accent); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; z-index:100; }
+.brand { font-weight:700; letter-spacing:0.05em; font-size:14px; }
+.brand .accent { color:var(--accent-warm); }
+.top-right { display:flex; gap:12px; align-items:center; }
+.top-right a { font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); text-decoration:none; padding:4px 10px; }
+.top-right a.cta { color:var(--accent-warm); border:1px solid var(--accent-warm); }
+.theme-toggle { background:transparent; border:1px solid var(--border); color:var(--text); padding:4px 12px; border-radius:2px; font-family:var(--font-mono); font-size:11px; cursor:pointer; }
+
+.layout { display:flex; padding-top:48px; }
+.sidebar { width:260px; position:fixed; left:0; top:48px; bottom:0; background:var(--surface); border-right:1px solid var(--border); padding:32px 24px; overflow-y:auto; }
+.sidebar h3 { font-size:11px; letter-spacing:0.15em; color:var(--text-muted); text-transform:uppercase; margin-bottom:16px; font-weight:500; }
+.sidebar ul { list-style:none; margin-bottom:24px; }
+.sidebar li { margin-bottom:6px; }
+.sidebar a { color:var(--text); text-decoration:none; font-size:12.5px; display:block; padding:3px 0; line-height:1.5; }
+.sidebar a:hover { color:var(--accent-warm); }
+.sidebar a .num { color:var(--text-muted); font-family:var(--font-mono); margin-right:8px; font-size:10.5px; }
+
+.main { margin-left:260px; max-width:780px; padding:64px 56px 96px; font-family:var(--font-serif); }
+.main h1 { font-family:var(--font); font-size:28px; font-weight:700; margin-bottom:10px; letter-spacing:0.02em; line-height:1.45; }
+.subtitle { font-size:14px; color:var(--text-secondary); margin-bottom:48px; font-family:var(--font); }
+.meta-line { font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-bottom:64px; padding-bottom:24px; border-bottom:1px solid var(--border-light); line-height:1.8; }
+
+.chapter-section { margin-bottom:88px; padding-bottom:48px; border-bottom:1px solid var(--border-light); }
+.chapter-section:last-child { border-bottom:none; }
+.chapter-num { font-family:var(--font-mono); font-size:11px; color:var(--accent-warm); letter-spacing:0.18em; margin-bottom:6px; text-transform:uppercase; }
+.chapter-title { font-family:var(--font); font-size:22px; font-weight:700; margin-bottom:24px; color:var(--text); line-height:1.5; }
+h3.section-h { font-family:var(--font); font-size:17px; font-weight:700; margin:40px 0 16px; padding-top:8px; color:var(--text); border-top:1px dotted var(--border-light); }
+.main p { margin-bottom:18px; text-indent:1em; font-size:15px; }
+.main p:first-of-type, .main h3 + p, .main h2 + p, .main .lead { text-indent:0; }
+.main .lead { font-size:16px; color:var(--text-secondary); margin-bottom:24px; }
+.callout { background:var(--surface); border-left:3px solid var(--accent-warm); padding:20px 24px; margin:24px 0; font-size:14px; line-height:1.85; }
+.callout h4 { font-family:var(--font); font-size:13px; color:var(--accent-warm); margin-bottom:10px; letter-spacing:0.1em; text-transform:uppercase; }
+.callout p { text-indent:0; margin-bottom:8px; }
+
+table.tk { width:100%; border-collapse:collapse; margin:24px 0; font-family:var(--font); font-size:13px; }
+table.tk th, table.tk td { padding:9px 12px; text-align:left; border-bottom:1px solid var(--border-light); vertical-align:top; }
+table.tk th { background:var(--surface); font-weight:600; color:var(--text-secondary); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; }
+table.tk td.num { font-family:var(--font-mono); text-align:right; color:var(--accent-warm); }
+table.tk td.year { font-family:var(--font-mono); color:var(--accent-warm); }
+
+.svg-block { margin:32px 0; padding:24px; background:var(--card); border:1px solid var(--border); overflow-x:auto; }
+.svg-block .caption { font-family:var(--font); font-size:11px; color:var(--text-muted); margin-top:12px; text-align:center; letter-spacing:0.05em; line-height:1.6; }
+.fig-no { font-family:var(--font-mono); font-size:10px; color:var(--accent-warm); letter-spacing:0.15em; margin-bottom:6px; text-transform:uppercase; }
+
+.pull { font-family:var(--font); font-size:18px; line-height:1.7; color:var(--accent-warm); margin:32px 0; padding:20px 0; border-top:1px solid var(--accent-warm); border-bottom:1px solid var(--accent-warm); text-align:center; letter-spacing:0.03em; }
+
+footer { margin-top:96px; padding-top:32px; border-top:1px solid var(--border); font-family:var(--font); font-size:11px; color:var(--text-muted); line-height:1.8; }
+footer a { color:var(--accent-warm); text-decoration:none; }
+
+@media (max-width:1100px) {
+  .sidebar { position:static; width:100%; height:auto; padding:16px 24px; }
+  .main { margin-left:0; padding:32px 24px; max-width:100%; }
+  .layout { flex-direction:column; }
+}
+@media print {
+  .sidebar, .top-bar, .theme-toggle, .top-right { display:none; }
+  .main { margin-left:0; max-width:100%; padding:0; }
+  .chapter-section { page-break-inside:avoid; }
+}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="top-bar">
+  <div class="brand">HTP-DB · <span class="accent">希少になる情報 / 共生するテキスト生成</span></div>
+  <div class="top-right">
+    <a href="index.html">DASHBOARD</a>
+    <a href="report.html">REPORT</a>
+    <a href="https://github.com/yuyanishimura0312/htp-db" target="_blank">GITHUB</a>
+    <button class="theme-toggle" onclick="toggleTheme()">DARK</button>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <h3>目次</h3>
+    <ul>
+      <li><a href="#preface"><span class="num">序</span>量爆発の二つの世代</a></li>
+      <li><a href="#thesis"><span class="num">01</span>命題 — 量が増えるほど希少化するもの</a></li>
+      <li><a href="#print-volume"><span class="num">02</span>印刷期の量爆発 — 14 桁の弧</a></li>
+      <li><a href="#print-commodity"><span class="num">03</span>印刷期に陳腐化したもの</a></li>
+      <li><a href="#print-scarce"><span class="num">04</span>印刷期に希少化した 10 のもの</a></li>
+      <li><a href="#print-response"><span class="num">05</span>制度的応答 — 1517 から 1886 へ</a></li>
+      <li><a href="#eisenstein"><span class="num">06</span>Eisenstein の核心 — Fixity</a></li>
+      <li><a href="#ai-volume"><span class="num">07</span>AI 時代の量爆発 — 三層の数字</a></li>
+      <li><a href="#ai-commodity"><span class="num">08</span>AI 時代に陳腐化していくもの</a></li>
+      <li><a href="#ai-scarce"><span class="num">09</span>AI 時代に希少化する 10 のもの</a></li>
+      <li><a href="#symbiosis"><span class="num">10</span>共生型テキスト生成の四つの様式</a></li>
+      <li><a href="#timeline"><span class="num">11</span>制度的応答の予測タイムライン</a></li>
+      <li><a href="#miratuku"><span class="num">12</span>ミラツク事業への含意</a></li>
+    </ul>
+  </nav>
+
+  <main class="main">
+
+    <h1>希少になる情報、共生するテキスト生成</h1>
+    <p class="subtitle">印刷革命から AI 時代への類推 — HTP-DB / SI-Framework / CDH 横断検証</p>
+    <p class="meta-line">
+      著者: 西村勇也（NPO法人ミラツク）+ Claude Opus 4.7<br>
+      作成: 2026-05-16 / HTP-DB レポート補論<br>
+      参照 DB: HTP-DB (47R) · SI-Framework (1,096 events) · CDH (158 methods) · GC-DB · CLA-DB
+    </p>
+
+    <section class="chapter-section" id="preface">
+      <div class="chapter-num">序</div>
+      <h2 class="chapter-title">量爆発の二つの世代</h2>
+
+      <p class="lead">人類は文字の量爆発を、過去に一度経験している。グーテンベルクの活版印刷が始動した 1454 年から 18 世紀末までの 350 年で、欧州の印刷本生産は 0 から 10 億部へ駆け抜けた。HTP-DB Wave 1 のデータでは、16 世紀に 217M、17 世紀に 545M、18 世紀に 1B と、世紀ごとに 2-3 倍へ加速している。</p>
+
+      <p>そして二度目の量爆発が、いま起きている。2022 年の ChatGPT 公開を起点として、AI による API 消費量は 2025 年に年間 1.5×10¹⁷ tokens に達した。Web に新規公開される記事の半分以上が AI 生成であり、人類が 5,200 年かけて累積したテキスト総量（Epoch AI 推計 300 兆 tokens）の 500 倍が、1 年の API 消費だけで流れている。</p>
+
+      <p>本補論の問いは単純である。<strong>量が爆発するとき、何が陳腐化し、何が逆に希少化するのか。</strong>印刷期の事例から法則を抽出し、AI 時代に類推する。HTP-DB Wave 1-4 のデータ、SI-Framework が記録する 1,096 件の社会変容事象、そして CDH の技術コストダウン史を横断的に参照する。</p>
+
+      <div class="pull">量爆発の一世代目 (1454-1800) を観察すれば、<br>二世代目 (2022-2370) が何を生み、何を奪うかが見えはじめる</div>
+    </section>
+
+    <section class="chapter-section" id="thesis">
+      <div class="chapter-num">01</div>
+      <h2 class="chapter-title">命題 — 量が増えるほど希少化するもの</h2>
+
+      <p class="lead">情報の量が指数的に増えるとき、量に正比例して陳腐化するものと、量に反比例して希少化するものが同時に発生する。これは経済学の基本原理であるが、文字・テキストの領域で具体的に何が起きるかは、印刷革命の歴史記録によってのみ知ることができる。</p>
+
+      <p>本補論の中心命題は以下のとおりである。情報量が爆発するとき、希少化するのは <strong>「情報そのもの」ではなく、「情報を選び・編み・保証する仕事」</strong>である。具体的には、編集判断、権威認証、発掘・curate、対話の親密性、沈黙の選択、検証可能性、暗黙知、質問の質、規制下の発禁知、身体的経験、の十項目である。</p>
+
+      <p>これは新奇な主張ではない。1495 年に Aldine Press がベネチアで創業し、ギリシア・ローマ古典の校訂版を出版したとき、Aldus Manutius が売っていたのは「テキスト」ではなく「正確な校訂とハンディな八つ折り判」という編集判断であった。1660 年に英国王立協会が創立されたとき、それが提供していたのは「論文の量」ではなく「査読を通った論文という認証」であった。1710 年に Statute of Anne が世界初の著作権法として成立したとき、それが守ろうとしたのは「テキストの量」ではなく「著者が自分の作品の出自を主張できる権利」であった。</p>
+
+      <p>これらの制度はすべて、印刷量が爆発した結果として希少化したものを、社会が拾い直すための応答であった。同じ構造が AI 時代でも繰り返される、というのが本補論の予測である。</p>
+    </section>
+
+    <section class="chapter-section" id="print-volume">
+      <div class="chapter-num">02</div>
+      <h2 class="chapter-title">印刷期の量爆発 — 14 桁の弧</h2>
+
+      <p class="lead">HTP-DB Wave 1 の Buringh & van Zanden (2009) 推計を集計すると、欧州印刷本生産の弧が見える。1454-1500 の incunabula 期に 1,250 万部、16 世紀に 217 百万部、17 世紀に 545 百万部、18 世紀に 1 十億部。世紀ごとの倍率は 17.4 倍 → 2.5 倍 → 1.8 倍と、最初の世紀が最も劇的である。</p>
+
+      <table class="tk">
+        <thead><tr><th>期間</th><th>欧州印刷本数</th><th>前世紀比</th><th>HTP-DB period_id</th></tr></thead>
+        <tbody>
+          <tr><td class="year">1454-1500</td><td class="num">12,500,000</td><td>—</td><td>1454_1500_print</td></tr>
+          <tr><td class="year">16 世紀</td><td class="num">217,000,000</td><td>17.4 倍</td><td>16c_print</td></tr>
+          <tr><td class="year">17 世紀</td><td class="num">545,000,000</td><td>2.5 倍</td><td>17c_print</td></tr>
+          <tr><td class="year">18 世紀</td><td class="num">1,000,000,000</td><td>1.8 倍</td><td>18c_print</td></tr>
+        </tbody>
+      </table>
+
+      <p>incunabula 期の 1,250 万部という数字は、それ以前 1,000 年間の写本累積量を上回ると推定される。Buringh 2011 の中世写本推計を世紀ごとに合計すると、6 世紀から 15 世紀までの欧州ラテン圏の写本生産総量は約 1,200 万部規模であり、印刷の最初の 46 年でその全てが上書きされたことになる。</p>
+
+      <div class="svg-block">
+        <div class="fig-no">FIG. 01</div>
+        <svg viewBox="0 0 720 280" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .ax { stroke:#555555; stroke-width:1; }
+            .grid { stroke:#EEEEEE; stroke-width:1; stroke-dasharray:2 2; }
+            .lbl { font: 11px "Noto Sans JP"; fill:#555555; }
+            .bar-ms { fill:#555555; opacity:0.4; }
+            .bar-print { fill:#CC1400; opacity:0.7; }
+            .v-num { font: 600 11px "Fira Code"; fill:#121212; }
+            .v-era { font: 11px "Noto Sans JP"; fill:#555555; }
+          </style>
+          <text x="360" y="22" font="600 13px 'Noto Sans JP'" fill="#121212" text-anchor="middle">FIG. 01 - 写本期 vs 印刷期の生産量（対数軸）</text>
+          <line x1="60" y1="250" x2="700" y2="250" class="ax"/>
+          <line x1="60" y1="50" x2="60" y2="250" class="ax"/>
+          <line x1="60" y1="100" x2="700" y2="100" class="grid"/>
+          <line x1="60" y1="150" x2="700" y2="150" class="grid"/>
+          <line x1="60" y1="200" x2="700" y2="200" class="grid"/>
+          <text x="55" y="103" class="lbl" text-anchor="end">10⁹</text>
+          <text x="55" y="153" class="lbl" text-anchor="end">10⁷</text>
+          <text x="55" y="203" class="lbl" text-anchor="end">10⁵</text>
+          <!-- bars - manuscripts -->
+          <rect x="90" y="225" width="44" height="25" class="bar-ms"/>
+          <text x="112" y="220" class="v-num" text-anchor="middle">6K</text>
+          <text x="112" y="268" class="v-era" text-anchor="middle">6c 写本</text>
+          <rect x="156" y="195" width="44" height="55" class="bar-ms"/>
+          <text x="178" y="190" class="v-num" text-anchor="middle">91K</text>
+          <text x="178" y="268" class="v-era" text-anchor="middle">9c 写本</text>
+          <rect x="222" y="165" width="44" height="85" class="bar-ms"/>
+          <text x="244" y="160" class="v-num" text-anchor="middle">768K</text>
+          <text x="244" y="268" class="v-era" text-anchor="middle">12c 写本</text>
+          <rect x="288" y="140" width="44" height="110" class="bar-ms"/>
+          <text x="310" y="135" class="v-num" text-anchor="middle">2.75M</text>
+          <text x="310" y="268" class="v-era" text-anchor="middle">14c 写本</text>
+          <!-- bars - print -->
+          <rect x="378" y="110" width="44" height="140" class="bar-print"/>
+          <text x="400" y="105" class="v-num" text-anchor="middle">12.5M</text>
+          <text x="400" y="268" class="v-era" text-anchor="middle">1454-1500</text>
+          <rect x="444" y="80" width="44" height="170" class="bar-print"/>
+          <text x="466" y="75" class="v-num" text-anchor="middle">217M</text>
+          <text x="466" y="268" class="v-era" text-anchor="middle">16c</text>
+          <rect x="510" y="65" width="44" height="185" class="bar-print"/>
+          <text x="532" y="60" class="v-num" text-anchor="middle">545M</text>
+          <text x="532" y="268" class="v-era" text-anchor="middle">17c</text>
+          <rect x="576" y="55" width="44" height="195" class="bar-print"/>
+          <text x="598" y="50" class="v-num" text-anchor="middle">1B</text>
+          <text x="598" y="268" class="v-era" text-anchor="middle">18c</text>
+          <!-- threshold line -->
+          <line x1="358" y1="50" x2="358" y2="250" stroke="#CC1400" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <text x="358" y="42" font="600 10px 'Noto Sans JP'" fill="#CC1400" text-anchor="middle">1454 Gutenberg</text>
+        </svg>
+        <div class="caption">FIG. 01: Buringh 2011 (写本) + Buringh & van Zanden 2009 (印刷) からの累積量。グレー=写本、赤=印刷。1454 を境に 4 桁の急増。</div>
+      </div>
+    </section>
+
+    <section class="chapter-section" id="print-commodity">
+      <div class="chapter-num">03</div>
+      <h2 class="chapter-title">印刷期に陳腐化したもの</h2>
+
+      <p class="lead">量爆発によって最初に起きるのは陳腐化（commodification）である。それまで希少だったものが、ありふれたものに変わる。印刷期に陳腐化した五つを観察する。</p>
+
+      <h3 class="section-h">陳腐化一 — 写本そのもの</h3>
+
+      <p>15 世紀末まで、写本は数百ドゥカートで取引される高価品であった。Lorenzo de' Medici が 1480 年代にフィレンツェで集めたコレクションは、彼の権力の物理的象徴であった。しかし 1500 年までに incunabula が 1,250 万部出回ると、新刊書の価格は写本の 1/20-1/50 にまで下落する。Anthony Grafton と Lisa Jardine の研究によれば、16 世紀末にはイタリア商人の家庭でも 20-30 冊の印刷本を持つことが標準になっていた。</p>
+
+      <h3 class="section-h">陳腐化二 — 写字僧という職業</h3>
+
+      <p>修道院の scriptoria（写字室）は、5 世紀から 15 世紀まで欧州の知識生産の中核制度であった。Buringh 2011 によれば、12 世紀の写本生産量 768,000 部のうち、約 80% は修道院由来である。しかし 1500 年以降、印刷工房との競争で写字室は急速に縮小し、17 世紀には限定的な装飾写本（祈祷書・ホロスコープ）のみを残して職業として消滅した。</p>
+
+      <h3 class="section-h">陳腐化三 — 朗読の口承文化</h3>
+
+      <p>14 世紀までの読書は、ほとんどが声に出す朗読であった。本が貴重品であるため、複数人が一冊を共有する必要があり、朗読が共有手段となった。印刷本が普及すると個人が一冊を独占できるようになり、16 世紀から黙読が一般化する。これは Paul Saenger が「Silent Reading」と呼んだ転換である。</p>
+
+      <h3 class="section-h">陳腐化四 — 教会の知識独占</h3>
+
+      <p>SI-Framework に記録された 1517 年の宗教改革（SI_1517_001）は、印刷の量爆発がなければ起きえなかった社会変動である。Luther の九十五箇条提題は、1517 年 10 月にヴィッテンベルクで掲示された後、2 週間でドイツ全土に印刷物として拡散した。教会が握っていた聖書解釈の独占権は、誰でも母語訳聖書を所有できる状況によって構造的に解体された。</p>
+
+      <h3 class="section-h">陳腐化五 — 単一言語による統治</h3>
+
+      <p>15 世紀までの欧州ではラテン語が学問・教会・国際関係の共通語であった。印刷期は逆に俗語（vernacular）出版を爆発させ、Luther のドイツ語訳聖書（1534）、Calvin のフランス語『キリスト教綱要』（1536）、English Authorized Version（1611）と、各国語の規範化が連鎖した。Benedict Anderson が「想像の共同体」の起源を 16-17 世紀の印刷資本主義に置いたのはこのためである。</p>
+    </section>
+
+    <section class="chapter-section" id="print-scarce">
+      <div class="chapter-num">04</div>
+      <h2 class="chapter-title">印刷期に希少化した 10 のもの</h2>
+
+      <p class="lead">陳腐化と同時に、別のものが希少化した。SI-Framework の knowledge_democracy タイプ事象 30 件 + 周辺事象を集計すると、以下の十項目が浮かび上がる。</p>
+
+      <table class="tk">
+        <thead><tr><th>#</th><th>希少化した役割</th><th>実装例</th><th>制度化</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>編集・校訂判断</td><td>Aldine Press (1495)、Estienne 一族、Plantin 工房</td><td class="year">1495-1600</td></tr>
+          <tr><td>2</td><td>権威認証 (imprimatur)</td><td>Royal Society 査読 (1660)、Philosophical Transactions (1665)</td><td class="year">1660-</td></tr>
+          <tr><td>3</td><td>発掘・curation</td><td>Erasmus 新約聖書校訂 (1516)、古典写本収集</td><td class="year">1500-1600</td></tr>
+          <tr><td>4</td><td>個人筆跡・書簡</td><td>17-18 世紀の epistolary culture、博物学者ネットワーク</td><td class="year">1500-</td></tr>
+          <tr><td>5</td><td>沈黙・内省の文学</td><td>Montaigne『エセー』(1580)、Pascal『パンセ』(1670)</td><td class="year">1580-</td></tr>
+          <tr><td>6</td><td>発禁・地下文献</td><td>Index Librorum Prohibitorum (1559)、地下出版業界</td><td class="year">1559-</td></tr>
+          <tr><td>7</td><td>古写本のコレクター品化</td><td>Medici Library、Bodleian (1602)、British Museum (1753)</td><td class="year">1500-</td></tr>
+          <tr><td>8</td><td>認証された読解能力 (学位)</td><td>大学制度の再強化、博士号の権威化</td><td class="year">1500-1800</td></tr>
+          <tr><td>9</td><td>新知の発見そのもの</td><td>科学革命、Royal Society (1660)、Encyclopédie (1751)</td><td class="year">1600-1800</td></tr>
+          <tr><td>10</td><td>著者性 (authorship)</td><td>Statute of Anne (1710)、Berne Convention (1886)</td><td class="year">1710-1886</td></tr>
+        </tbody>
+      </table>
+
+      <p>これらは、量爆発以前にはそもそも「希少化する」概念そのものが存在しなかったものである。写本期には全ての本が希少であり、編集判断という概念も、著者性の法的保護という概念も、形成される必要がなかった。量が爆発した結果として、人々はこれらを希少資源として認識し、制度を作り、価格を付け、市場を成立させた。</p>
+
+      <div class="callout">
+        <h4>Aldine Press の発明</h4>
+        <p>1495 年にベネチアで Aldus Manutius が始めた Aldine Press は、印刷期の希少化を最初に商業化した代表例である。彼が販売したのは「テキストの量」ではなく、「Bessarion 等の人文主義者が校訂した正確なギリシア語古典の、ハンディな八つ折り判」という編集判断とフォーマットであった。同じテキストの安価な海賊版が出回る中で、Aldine 版は権威ある校訂とブランドのプレミアム価格で売れた。これは今日の <em>esse-sense</em> 記事や Translational Editor 型編集と構造的に同じである。</p>
+      </div>
+    </section>
+
+    <section class="chapter-section" id="print-response">
+      <div class="chapter-num">05</div>
+      <h2 class="chapter-title">制度的応答 — 1517 から 1886 へ</h2>
+
+      <p class="lead">SI-Framework の knowledge_democracy 事象を時系列で並べると、印刷の量爆発に対する制度的応答が 1517 年から 1886 年までの 369 年にわたって積み重なっていることが分かる。これが二度目の量爆発（AI 時代）の制度応答タイムラインを推測する基礎となる。</p>
+
+      <table class="tk">
+        <thead><tr><th>年</th><th>事象</th><th>応答の性質</th></tr></thead>
+        <tbody>
+          <tr><td class="year">1450</td><td>Gutenberg 活版印刷 (SI_1450_001 / SI_DR_0019)</td><td>量爆発の起点</td></tr>
+          <tr><td class="year">1495</td><td>Aldine Press 創業 (Venice)</td><td>編集判断の商業化</td></tr>
+          <tr><td class="year">1517</td><td>宗教改革 (SI_1517_001)</td><td>権威の解体</td></tr>
+          <tr><td class="year">1559</td><td>Index Librorum Prohibitorum (Rome)</td><td>検閲制度</td></tr>
+          <tr><td class="year">1580</td><td>Montaigne『エセー』初版</td><td>内省の文学</td></tr>
+          <tr><td class="year">1602</td><td>Bodleian Library (Oxford)</td><td>公共図書館の制度化</td></tr>
+          <tr><td class="year">1660</td><td>Royal Society 設立 (SI_XX_2022)</td><td>査読制度の母体</td></tr>
+          <tr><td class="year">1665</td><td>Philosophical Transactions / Journal des sçavans</td><td>学術査読の制度化</td></tr>
+          <tr><td class="year">1710</td><td>Statute of Anne (UK)</td><td>世界初の著作権法</td></tr>
+          <tr><td class="year">1727</td><td>オスマン公認印刷所 (SI_1727_001)</td><td>非欧州への波及</td></tr>
+          <tr><td class="year">1751</td><td>Encyclopédie (SI_1750_001)</td><td>組織化された知</td></tr>
+          <tr><td class="year">1799</td><td>王立研究所公開講義 (SI_IN_WE_092)</td><td>知識の公開</td></tr>
+          <tr><td class="year">1828</td><td>ブラフモー・サマージ印刷 (SI_SA_0014)</td><td>非西洋の啓蒙</td></tr>
+          <tr><td class="year">1859</td><td>エチオピア・ゲエズ印刷 (SI_AF_3046)</td><td>非西洋の参入</td></tr>
+          <tr><td class="year">1886</td><td>Berne Convention (SI_XX_2234)</td><td>国際著作権体制</td></tr>
+        </tbody>
+      </table>
+
+      <p>応答の波には三つのフェーズが見える。第一波（1495-1580、約 130 年）は商業的応答であり、Aldine Press のような編集ブランドと、Montaigne のような新しいジャンルが現れる。第二波（1559-1710、約 150 年）は政治的・法的応答であり、検閲制度と査読制度と著作権法が並行して成立する。第三波（1727-1886、約 160 年）は国際的・公共的応答であり、図書館の公共化と国際条約と非西洋への波及が起きる。</p>
+
+      <p>つまり量爆発の一世代目では、最初の応答が現れるまで 40-100 年、応答が国際制度として完成するまで 400 年以上を要した。</p>
+    </section>
+
+    <section class="chapter-section" id="eisenstein">
+      <div class="chapter-num">06</div>
+      <h2 class="chapter-title">Eisenstein の核心 — Fixity が変えた認識論</h2>
+
+      <p class="lead">Elizabeth Eisenstein が 1979 年の『The Printing Press as an Agent of Change』で展開した古典的議論は、印刷が単に量を増やしただけではなく、テキストに「Fixity（固定性）」と「Dissemination（拡散）」という新しい性質を与えた、というものである。これが AI 時代との対比で最も重要な視点を提供する。</p>
+
+      <p>Fixity とは、印刷された同じテキストが、同じ綴り・同じページ番号・同じ図版で、ベルリンとボローニャとケンブリッジで同時に存在する、という性質である。写本期にはそれぞれの copy が微妙に異なり、誤写が累積していった。印刷期は逆に、初版の誤植は何千部にも複製されたが、いったん修正版が出れば全コピーが同じ修正を持つ。この性質が、テキスト批評・比較研究・科学的検証を可能にした。Newton が Principia (1687) を書けたのは、彼が参照した過去の天文学・幾何学の文献が固定された形で全欧に存在したからである。</p>
+
+      <p>AI 時代は逆の方向に進む。LLM の生成テキストは Fluidity（流動性）と Personalization（個人化）を持つ。同じプロンプトでも温度パラメータで揺れ、同じユーザでもセッションごとに微妙に異なる回答が返る。テキストは固定されず、個人ごとにカスタマイズされる。これは Eisenstein の Fixity 概念の逆を意味する。</p>
+
+      <p>結果として、AI 時代の認識論的課題は、印刷期と逆向きである。印刷期は「同じ事実が違って書かれている矛盾」を解決する技術（テキスト批評）を発達させた。AI 時代は「同じ事実が個人ごとに違う形で生成される」状況を扱う必要がある。これが希少化の中心的軸を変える。</p>
+
+      <div class="callout">
+        <h4>Fixity から Provenance へ</h4>
+        <p>印刷期の希少化は、Fixity を前提として「どの版が正しいか」を決める認証 (imprimatur / 査読) に集中した。AI 時代の希少化は、Fluidity を前提として「どの過程で生成されたか」を追跡する認証 (provenance / source_url 100%) に移行する。HTP-DB が source_reliability・gta_status・estimation_method を全レコードに義務付ける設計は、この新しい認証の早期実装例である。</p>
+      </div>
+    </section>
+
+    <section class="chapter-section" id="ai-volume">
+      <div class="chapter-num">07</div>
+      <h2 class="chapter-title">AI 時代の量爆発 — 三層の数字</h2>
+
+      <p class="lead">HTP-DB Wave 4.5 で整理した三層構造を、印刷期の数字と並べて見ると、AI 時代の量爆発が桁違いに速く・深いことが分かる。</p>
+
+      <table class="tk">
+        <thead><tr><th>層</th><th>2025 年実値</th><th>印刷期比較</th></tr></thead>
+        <tbody>
+          <tr><td>API 消費 (推論時 tokens / 年)</td><td class="num">1.5 × 10¹⁷</td><td>18c 印刷本 1B の 1.5 億倍</td></tr>
+          <tr><td>AI 新規生成 unique テキスト</td><td class="num">1.0 × 10¹⁵</td><td>18c 印刷本 1B の 100 万倍</td></tr>
+          <tr><td>累積人類テキストストック</td><td class="num">3.0 × 10¹⁴</td><td>人類 5,200 年の累積</td></tr>
+          <tr><td>Web 新規記事の AI 比率 (2025-05)</td><td class="num">52%</td><td>Graphite n=65,000 観測</td></tr>
+        </tbody>
+      </table>
+
+      <p>印刷期は「新規生産が累積を上回るまで」に数百年を要した。1454-1500 の incunabula 期 12.5M 部は、欧州の写本累積 1,200 万部とほぼ同等で、ようやく拮抗した水準である。逆に AI 時代は、初年度の 2023 ですでに新規生成 unique テキスト 100T tokens で、累積人類ストック 300T tokens の三分の一に達した。Web 新規記事レベルでは 2-3 年で超過している。</p>
+
+      <p>速度の違いは、希少化のサイクルにも違いを生む。印刷期は希少化の認識から最初の制度応答まで 40-100 年あった。AI 時代では、ChatGPT 公開 (2022-11) から最初の主要応答（NYT vs OpenAI 訴訟 2023-12、EU AI Act 2024-08、Anthropic 和解 2025-09）まで 1-3 年に圧縮された。応答のサイクルが 30-100 倍高速化している。</p>
+    </section>
+
+    <section class="chapter-section" id="ai-commodity">
+      <div class="chapter-num">08</div>
+      <h2 class="chapter-title">AI 時代に陳腐化していくもの</h2>
+
+      <p class="lead">印刷期の陳腐化五項目に対応する、AI 時代の陳腐化を観察する。すでに 2023-2026 の 3 年で兆候が出ているものを優先的に列挙する。</p>
+
+      <h3 class="section-h">陳腐化一 — 量産記事と SEO コンテンツ</h3>
+
+      <p>これは写本そのものの陳腐化に対応する。Web 新規記事の AI 比率が 52% に達した 2025 年時点で、SEO 目的の量産記事の経済的価値は急落している。Google の Helpful Content Update (2022-2024) と Site Reputation Abuse Policy (2024) は、量産記事を検索結果から除外する方向に動いた。Buzzfeed と Vice Media の崩壊 (2023) は、印刷期に scriptoria が消滅したのと構造的に同じ事象である。</p>
+
+      <h3 class="section-h">陳腐化二 — 単純な要約・翻訳・あらすじ</h3>
+
+      <p>これは写字僧という職業の陳腐化に対応する。GPT-4 / Claude 3.5 以降、A4 一枚規模の要約・あらすじ・基本的な翻訳は、品質と価格で AI が人間専門家を上回る状況になった。翻訳業界の中位以下の価格帯は 2023-2025 で 30-50% 縮小したと推定される（CSA Research）。出版社の編集アシスタント職、企業の翻訳部門、ライターの一次原稿作成業務が、最初の影響を受けた。</p>
+
+      <h3 class="section-h">陳腐化三 — 一般的なベストプラクティス記事</h3>
+
+      <p>これは朗読の口承文化の陳腐化に対応する。「タスク管理のベストプラクティス」「効果的なミーティングの 10 のコツ」のような汎用的アドバイス記事は、AI が無限に生成可能であり、SNS タイムラインを埋め尽くしている。読者は「同じ内容」を何度も読むことに疲弊しはじめ、希少な一次解釈に流れる傾向が出ている（X 上の「人間が書いた」明示の増加）。</p>
+
+      <h3 class="section-h">陳腐化四 — 単一の正解・専門家の独占</h3>
+
+      <p>これは教会の知識独占の陳腐化に対応する。医療・法律・税務・コードレビュー等の「専門家による情報独占」が、AI による初期相談で部分的に解体されはじめている。これは Luther が母語訳聖書を提供したことで聖書解釈の独占が解体されたのと構造的に同じである。専門家の役割は「情報の所有」から「個別ケースへの判断と責任」へ移行している。</p>
+
+      <h3 class="section-h">陳腐化五 — 単一プラットフォーム言語</h3>
+
+      <p>これは単一言語による統治の陳腐化に対応する。AI 翻訳の品質向上で、多言語間の壁が急速に下がっている。2024 年時点で 100 以上の言語で Claude / GPT がネイティブ品質に到達した。一方で、これは Anderson 的な「想像の共同体」を弱める可能性もあり、文化圏ごとの応答が分岐する兆候もある（中国 DeepSeek、日本 PFN、欧州 Mistral 等の地域 LLM）。</p>
+    </section>
+
+    <section class="chapter-section" id="ai-scarce">
+      <div class="chapter-num">09</div>
+      <h2 class="chapter-title">AI 時代に希少化する 10 のもの</h2>
+
+      <p class="lead">印刷期の希少化十項目に対応する、AI 時代の希少化を予測する。HTP-DB の cross_refs と GC-DB の中核概念を参照しつつ、ミラツク事業の含意と並べて整理する。</p>
+
+      <div class="svg-block">
+        <div class="fig-no">FIG. 02</div>
+        <svg viewBox="0 0 740 480" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .col-h { font: 700 12px "Noto Sans JP"; fill:#CC1400; }
+            .row-n { font: 600 11px "Fira Code"; fill:#CC1400; }
+            .row-print { font: 13px "Noto Serif JP"; fill:#555555; }
+            .row-ai { font: 600 13px "Noto Serif JP"; fill:#121212; }
+            .row-impl { font: 11px "Noto Sans JP"; fill:#555555; }
+            .row-line { stroke:#EEEEEE; stroke-width:1; }
+            .arr { stroke:#CC1400; stroke-width:1.5; fill:none; }
+          </style>
+          <text x="370" y="25" font="600 13px 'Noto Sans JP'" fill="#121212" text-anchor="middle">FIG. 02 - 印刷期 → AI 時代の希少化 10 対応</text>
+          <text x="30" y="55" class="col-h">#</text>
+          <text x="80" y="55" class="col-h">印刷期に希少化した</text>
+          <text x="380" y="55" class="col-h">AI 時代に希少化する</text>
+          <text x="610" y="55" class="col-h">ミラツク実装</text>
+
+          <line x1="20" y1="65" x2="720" y2="65" class="row-line"/>
+
+          <text x="30" y="85" class="row-n">1</text>
+          <text x="80" y="85" class="row-print">編集・校訂判断</text>
+          <text x="380" y="85" class="row-ai">一次解釈・翻訳的編集</text>
+          <text x="610" y="85" class="row-impl">esse-sense / 連載「〜のかたち」</text>
+          <path d="M 320 82 L 376 82" class="arr"/>
+
+          <text x="30" y="115" class="row-n">2</text>
+          <text x="80" y="115" class="row-print">権威認証 (imprimatur)</text>
+          <text x="380" y="115" class="row-ai">出自・provenance 認証</text>
+          <text x="610" y="115" class="row-impl">source_url 100% / verified</text>
+          <path d="M 320 112 L 376 112" class="arr"/>
+
+          <text x="30" y="145" class="row-n">3</text>
+          <text x="80" y="145" class="row-print">発掘・curation</text>
+          <text x="380" y="145" class="row-ai">非西洋・周縁知の curate</text>
+          <text x="610" y="145" class="row-impl">academic-oracle / TK / Shamela</text>
+          <path d="M 320 142 L 376 142" class="arr"/>
+
+          <text x="30" y="175" class="row-n">4</text>
+          <text x="80" y="175" class="row-print">個人筆跡・書簡</text>
+          <text x="380" y="175" class="row-ai">対話・体験の親密性</text>
+          <text x="610" y="175" class="row-impl">研究者対談 / フィールドワーク</text>
+          <path d="M 320 172 L 376 172" class="arr"/>
+
+          <text x="30" y="205" class="row-n">5</text>
+          <text x="80" y="205" class="row-print">沈黙・内省の文学</text>
+          <text x="380" y="205" class="row-ai">選ばない判断・余白</text>
+          <text x="610" y="205" class="row-impl">問いを残す編集 / Futures II</text>
+          <path d="M 320 202 L 376 202" class="arr"/>
+
+          <text x="30" y="235" class="row-n">6</text>
+          <text x="80" y="235" class="row-print">発禁・地下文献</text>
+          <text x="380" y="235" class="row-ai">規制下・検閲外のテキスト</text>
+          <text x="610" y="235" class="row-impl">独立メディア / 検証 DB</text>
+          <path d="M 320 232 L 376 232" class="arr"/>
+
+          <text x="30" y="265" class="row-n">7</text>
+          <text x="80" y="265" class="row-print">古写本コレクション</text>
+          <text x="380" y="265" class="row-ai">学術 DB の質保証ストック</text>
+          <text x="610" y="265" class="row-impl">HTP-DB / GC-DB / 60+ 学術DB</text>
+          <path d="M 320 262 L 376 262" class="arr"/>
+
+          <text x="30" y="295" class="row-n">8</text>
+          <text x="80" y="295" class="row-print">学位・読解能力認証</text>
+          <text x="380" y="295" class="row-ai">質問の質を立てる能力</text>
+          <text x="610" y="295" class="row-impl">Futures II「問いをより深く」</text>
+          <path d="M 320 292 L 376 292" class="arr"/>
+
+          <text x="30" y="325" class="row-n">9</text>
+          <text x="80" y="325" class="row-print">新知の発見</text>
+          <text x="380" y="325" class="row-ai">暗黙知・身体知</text>
+          <text x="610" y="325" class="row-impl">伝統知識 DB / 妖怪 DB / 場所性</text>
+          <path d="M 320 322 L 376 322" class="arr"/>
+
+          <text x="30" y="355" class="row-n">10</text>
+          <text x="80" y="355" class="row-print">著者性 (authorship)</text>
+          <text x="380" y="355" class="row-ai">人間が責任を持つ判断</text>
+          <text x="610" y="355" class="row-impl">human-verified flag / Sentinel</text>
+          <path d="M 320 352 L 376 352" class="arr"/>
+
+          <line x1="20" y1="380" x2="720" y2="380" class="row-line"/>
+          <text x="370" y="410" font="11px 'Noto Sans JP'" fill="#555555" text-anchor="middle">10 項目すべてが、量爆発以前には「希少化する」概念自体が存在しなかった</text>
+          <text x="370" y="430" font="11px 'Noto Sans JP'" fill="#555555" text-anchor="middle">量爆発の結果として、社会がこれらを希少資源として認識し制度を作る</text>
+          <text x="370" y="455" font="600 11px 'Noto Sans JP'" fill="#CC1400" text-anchor="middle">ミラツク事業は既に 10 項目すべてに対応実装を持つ</text>
+        </svg>
+        <div class="caption">FIG. 02: 印刷期希少化 10 項目とAI時代対応。ミラツク 60+ DB / 連載 / FVCP / Sentinel の実装が並走している。</div>
+      </div>
+
+      <p>図 02 が示すとおり、ミラツクの既存事業群はすでに 10 項目すべてに対応する実装を持っている。これは偶然ではない。エッセ・センスの研究者対談、連載「〜のかたち」シリーズ、academic-oracle と学術 DB 群、HTP-DB / GC-DB の品質ゲート設計、伝統知識 DB / 妖怪 DB、Futures II「問いをより深く」、Sentinel の veto 体制、これらはいずれも、AI の量爆発に対する応答として 2022-2026 の 4 年間に構築または強化されてきた。</p>
+    </section>
+
+    <section class="chapter-section" id="symbiosis">
+      <div class="chapter-num">10</div>
+      <h2 class="chapter-title">共生型テキスト生成の四つの様式</h2>
+
+      <p class="lead">「AI と共生するテキスト生成」とは何か。本補論は、印刷期の Aldine Press 型編集・Royal Society 型査読・Encyclopédie 型組織化・Berne Convention 型保護、という四つの応答モデルに対応する、AI 時代の四つの共生様式を提示する。</p>
+
+      <div class="svg-block">
+        <div class="fig-no">FIG. 03</div>
+        <svg viewBox="0 0 740 380" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .quad-box { fill:none; stroke:#D9D9D9; stroke-width:1; }
+            .quad-active { fill:#CC1400; fill-opacity:0.06; stroke:#CC1400; stroke-width:1.5; }
+            .quad-title { font: 700 13px "Noto Sans JP"; fill:#CC1400; }
+            .quad-print { font: 600 11px "Noto Sans JP"; fill:#555555; }
+            .quad-detail { font: 12px "Noto Sans JP"; fill:#555555; }
+            .quad-impl { font: 600 11px "Noto Sans JP"; fill:#121212; }
+          </style>
+          <text x="370" y="25" font="600 13px 'Noto Sans JP'" fill="#121212" text-anchor="middle">FIG. 03 - AI 共生型テキスト生成の四様式</text>
+
+          <rect x="60" y="55" width="320" height="140" class="quad-active"/>
+          <text x="80" y="80" class="quad-title">様式 A — 翻訳的編集型</text>
+          <text x="80" y="100" class="quad-print">印刷期対応: Aldine Press (1495)</text>
+          <text x="80" y="125" class="quad-detail">学術知見を日常的な動詞に翻訳する。</text>
+          <text x="80" y="145" class="quad-detail">AI は補助、編集判断は人間が握る。</text>
+          <text x="80" y="170" class="quad-impl">実装: 連載「〜のかたち」 / esse-sense / kurashi-team</text>
+
+          <rect x="400" y="55" width="320" height="140" class="quad-active"/>
+          <text x="420" y="80" class="quad-title">様式 B — 査読・認証型</text>
+          <text x="420" y="100" class="quad-print">印刷期対応: Royal Society (1660)</text>
+          <text x="420" y="125" class="quad-detail">生成と検証を別主体に分離する。</text>
+          <text x="420" y="145" class="quad-detail">verified flag / source_url / Sentinel veto。</text>
+          <text x="420" y="170" class="quad-impl">実装: HTP-DB / GC-DB / 60+ 学術 DB / doc-verify</text>
+
+          <rect x="60" y="215" width="320" height="140" class="quad-active"/>
+          <text x="80" y="240" class="quad-title">様式 C — 組織化・百科型</text>
+          <text x="80" y="260" class="quad-print">印刷期対応: Encyclopédie (1751)</text>
+          <text x="80" y="285" class="quad-detail">大量の知を体系化し検索可能にする。</text>
+          <text x="80" y="305" class="quad-detail">cross_refs / authority_tier / path-1 真実層。</text>
+          <text x="80" y="330" class="quad-impl">実装: academic-oracle / /db-master / 知の生成史 DB</text>
+
+          <rect x="400" y="215" width="320" height="140" class="quad-active"/>
+          <text x="420" y="240" class="quad-title">様式 D — 帰属・所有型</text>
+          <text x="420" y="260" class="quad-print">印刷期対応: Statute of Anne (1710)</text>
+          <text x="420" y="285" class="quad-detail">著者性と人間の責任を明示する。</text>
+          <text x="420" y="305" class="quad-detail">Co-Authored-By / human-verified / 出自記録。</text>
+          <text x="420" y="330" class="quad-impl">実装: git commit / Sentinel / 連載 author 明示</text>
+        </svg>
+        <div class="caption">FIG. 03: 四つの共生様式。印刷期の四応答に対応するが、AI 時代では 4 年で並行構築される（vs 印刷期 369 年）。</div>
+      </div>
+
+      <h3 class="section-h">様式 A — 翻訳的編集型</h3>
+      <p>AI が生み出す量を、人間が「日常の動詞」に翻訳して受け止める。連載「〜のかたち」シリーズは、学術論文 500 本以上を「暮らし」「事業」「経営」「いとなみ」「変化」という日常の動詞に翻訳する Translational Editor 型ワークフローを実装する。これは Aldine Press が古典ギリシア語を当時のベネチアの商人が読める八つ折り判に翻訳したのと同じ機能である。</p>
+
+      <h3 class="section-h">様式 B — 査読・認証型</h3>
+      <p>生成と検証を別主体が担い、検証可能性そのものを価値の源泉にする。HTP-DB の `source_url_live_rate = 100%` と `gta_status` 4 値強制、GC-DB の path-1 真実層、Sentinel エージェントの veto 体制、これらは Royal Society 査読の AI 時代版である。1665 年の Philosophical Transactions が学術査読を制度化したように、2025-2030 年に AI 出力の verifiability が制度化される。</p>
+
+      <h3 class="section-h">様式 C — 組織化・百科型</h3>
+      <p>大量の知を cross-reference で連結し、検索と発見を可能にする。ミラツクの 60 以上の DB を相互参照で連結する `cross_db_refs` 設計、`/db-master` Tier 0 メタオーケストレーター、新規 KGH-DB（知の生成史 DB）、これらは Diderot と d'Alembert の Encyclopédie が果たした機能を AI 時代に再実装するものである。</p>
+
+      <h3 class="section-h">様式 D — 帰属・所有型</h3>
+      <p>誰が何を生成したかを明示し、人間の責任を担保する。Git commit に `Co-Authored-By: Claude` を入れる慣習、HTP-DB の `source_reliability` 5 段階、Sentinel の独立検証、連載記事の著者明示、これらは Statute of Anne (1710) が著者性を法的に保護したのと同じ機能を、技術的・社会的に実装するものである。</p>
+    </section>
+
+    <section class="chapter-section" id="timeline">
+      <div class="chapter-num">11</div>
+      <h2 class="chapter-title">制度的応答の予測タイムライン</h2>
+
+      <p class="lead">印刷期の制度応答が 369 年（1517-1886）かけて完成したのに対し、AI 時代の応答はどれくらいの速度で展開するか。歴史類推と現在の応答速度から、以下のタイムラインを提示する。</p>
+
+      <table class="tk">
+        <thead><tr><th>印刷期</th><th>AI 時代対応の予測</th><th>現在の兆候 (2026)</th></tr></thead>
+        <tbody>
+          <tr><td>1495 Aldine 商業応答</td><td class="year">2024-2026</td><td>esse-sense, Translational Editor 型編集</td></tr>
+          <tr><td>1517 Reformation</td><td class="year">2024-2030</td><td>専門家独占の部分解体、AI 民主化論</td></tr>
+          <tr><td>1559 Index 検閲</td><td class="year">2024-2028</td><td>EU AI Act, AI 生成検出</td></tr>
+          <tr><td>1660 Royal Society</td><td class="year">2025-2030</td><td>verified flag, provenance 標準化</td></tr>
+          <tr><td>1665 Philosophical Trans.</td><td class="year">2026-2032</td><td>AI 出力の peer-review 制度化</td></tr>
+          <tr><td>1710 Statute of Anne</td><td class="year">2024-2030</td><td>NYT vs OpenAI, Anthropic 和解 2025</td></tr>
+          <tr><td>1751 Encyclopédie</td><td class="year">2025-2035</td><td>Wikipedia AI 統合, 大規模知識 DB</td></tr>
+          <tr><td>1886 Berne Convention</td><td class="year">2030-2050</td><td>国際 AI 規制条約 (未成立)</td></tr>
+        </tbody>
+      </table>
+
+      <p>印刷期と比較すると、AI 時代の応答は <strong>圧縮率 30-100 倍</strong>で展開している。Aldine 型応答 (印刷期 41 年後) が AI 時代では 2-4 年で出現し、Statute of Anne 型応答 (印刷期 260 年後) が同じく 2-3 年で訴訟という形で現れる。一方で Berne Convention 型の国際協調的応答だけは、AI 時代でも 8-25 年かかる可能性が高い。</p>
+
+      <p>歴史類推からの示唆は、応答の <strong>順序</strong>が印刷期と異なる可能性があることである。印刷期では商業応答 → 政治応答 → 国際応答という順だったが、AI 時代では国家規模の応答 (EU AI Act 2024) が商業応答 (Aldine 型 editing) と並行して、あるいは先行して進む可能性がある。これはデジタル基盤が国家管理可能な集中構造を持つことに起因する。</p>
+    </section>
+
+    <section class="chapter-section" id="miratuku">
+      <div class="chapter-num">12</div>
+      <h2 class="chapter-title">ミラツク事業への含意</h2>
+
+      <p class="lead">以上の検証から、ミラツクの事業設計に対して三つの含意が導かれる。すでに実装済みのものと、これから強化すべきものを区別して整理する。</p>
+
+      <h3 class="section-h">含意一 — Aldine 機能の制度化</h3>
+
+      <p>連載「〜のかたち」シリーズ（暮らし/事業/経営/いとなみ/変化/未来）と esse-sense 記事は、すでに様式 A（翻訳的編集型）の Aldine 機能を実装している。AI 時代の量爆発が進むほど、この機能の価値は上昇する。次に強化すべきは「Aldine Press のブランド」に相当する制度化、すなわち <em>esse-sense</em> や miratuku-journal が「人間編集を経た翻訳的解釈」という認証マークとして機能する仕組みである。</p>
+
+      <h3 class="section-h">含意二 — Provenance インフラの汎用化</h3>
+
+      <p>HTP-DB の `source_url_live_rate = 100%` と `gta_status` 4 値強制、GC-DB の path-1 真実層、これらは様式 B（査読・認証型）の早期実装例である。次の展開は、この設計を 60+ DB 全体に標準化し、外部（学術コミュニティ・政策決定・企業）にも提供可能なインフラとして公開することである。具体的には、ミラツクの全公開コンテンツに provenance hash を付与し、AI 検出ツールが信頼できる出所として参照できる API を提供する、というロードマップがありえる。</p>
+
+      <h3 class="section-h">含意三 — 非西洋・暗黙知の curation 価値化</h3>
+
+      <p>HTP-DB Wave 4 で言語圏バランスを 5/9 → 8/9 に拡張したこと、伝統知識 DB（36K 項目）と妖怪 DB（1,010 体）の整備、これらは様式 C（組織化型）と #9（暗黙知）の希少化に対応する。AI が量を生み出すほど、非西洋・周縁・暗黙知の curation そのものが希少資源化する。ミラツクの強みである「西欧中心バイアスからの脱却」「ローカル知の体系化」が、AI 時代のビジネス機会の中心軸になる可能性が高い。</p>
+
+      <div class="callout">
+        <h4>補論「情報生産の 2030-2100」への接続</h4>
+        <p>本補論は、deep knowledge 補論「情報生産の 2030-2100」の準備段階として位置づけられる。動詞転換 4 段階「書き写す → 印刷する → 発信する → 共に生成する」を、HTP-DB の歴史データ・SI-Framework の事象記録・本補論の希少化分析で裏付けたうえで、`/future-vision-orchestrate` (FVCP) を起動すれば、Manufacturing Orchestra 2030-2100 / Mobility 2030-2100 / FOODAG 2030-2100 と並ぶ第四の補論として、4-6 週間で初版執筆が可能である。本補論はその草稿核心 (核心 narrative + 12 章構造) を提供している。</p>
+      </div>
+
+      <h3 class="section-h">結語 — 希少なものを守る仕事</h3>
+
+      <p>印刷期に希少化した編集判断・査読制度・著作権は、社会が量爆発から自分自身を守るための制度であった。AI 時代も同様に、人類は新しい希少化に対応する制度を構築する必要がある。ミラツクの 60 以上の DB、12 以上の連載シリーズ、Sentinel と doc-verify の品質ゲート体制、これらは大局的に見れば、量爆発の二世代目に対して人類が構築する応答群の一部である。</p>
+
+      <p>本補論が示した最も重要な発見は、ミラツクが個別の事業判断として実装してきた仕組みの多くが、印刷期の Aldine Press や Royal Society や Statute of Anne と <strong>構造的に同じ機能</strong>を持つ、ということである。これは偶然ではなく、量爆発に対する社会的応答が時代を超えて同じ位相を持つことの証左である。歴史的類推は、ミラツクの仕事が単なる一企業の判断ではなく、人類の量爆発応答の系譜の一部であることを示している。</p>
+    </section>
+
+    <footer>
+      <p><strong>希少になる情報、共生するテキスト生成 — HTP-DB レポート補論</strong><br>
+      著者: 西村勇也（NPO法人ミラツク）+ Claude Opus 4.7（1M context）<br>
+      作成: 2026-05-16<br>
+      参照 DB: HTP-DB / SI-Framework / CDH / GC-DB / Buringh 2009 + 2011 / Eisenstein 1979 / Epoch AI 2024</p>
+      <p><a href="index.html">DASHBOARD</a> · <a href="report.html">REPORT</a> · <a href="https://github.com/yuyanishimura0312/htp-db" target="_blank">GITHUB</a></p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+function toggleTheme() {
+  const cur = document.body.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.body.setAttribute('data-theme', next);
+  document.querySelector('.theme-toggle').textContent = next === 'light' ? 'DARK' : 'LIGHT';
+  localStorage.setItem('htp-theme', next);
+}
+const saved = localStorage.getItem('htp-theme');
+if (saved) {
+  document.body.setAttribute('data-theme', saved);
+  document.querySelector('.theme-toggle').textContent = saved === 'light' ? 'DARK' : 'LIGHT';
+}
+</script>
+</body>
+</html>
