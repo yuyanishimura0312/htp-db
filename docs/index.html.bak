@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>HTP-DB — 人類が生成した文字・テキストの量</title>
+<link rel="icon" href="https://esse-sense.com/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&family=Fira+Code&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --card-hover: #F7F7F5;
+  --accent: #121212;
+  --accent-soft: #555555;
+  --accent-warm: #CC1400;
+  --accent-warm-soft: #B01200;
+  --accent-muted: rgba(204,20,0,0.06);
+  --text: #121212;
+  --text-secondary: #555555;
+  --text-muted: #6B6B6B;
+  --border: #D9D9D9;
+  --border-light: #EEEEEE;
+  --highlight: #CC1400;
+  --surface: #F7F7F5;
+  --font: "Noto Sans JP", "Hiragino Sans", -apple-system, sans-serif;
+  --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
+  --font-mono: "Fira Code", "SF Mono", monospace;
+}
+[data-theme="dark"] {
+  --bg: #121212;
+  --card: #1A1A1A;
+  --card-hover: #222222;
+  --accent: #E0E0E0;
+  --accent-warm: #FF4030;
+  --accent-muted: rgba(255,64,48,0.10);
+  --text: #E0E0E0;
+  --text-secondary: #AAAAAA;
+  --text-muted: #8A8A8A;
+  --border: #333333;
+  --border-light: #2A2A2A;
+  --highlight: #FF4030;
+  --surface: #1A1A1A;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); }
+body { line-height: 1.85; letter-spacing: 0.025em; font-feature-settings: "palt"; }
+
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 48px;
+  background: var(--bg); border-top: 3px solid var(--accent);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; z-index: 100;
+}
+.brand { font-weight: 700; letter-spacing: 0.05em; font-size: 14px; }
+.brand .accent { color: var(--accent-warm); }
+.theme-toggle {
+  background: transparent; border: 1px solid var(--border); color: var(--text);
+  padding: 4px 12px; border-radius: 2px; font-family: var(--font-mono);
+  font-size: 11px; cursor: pointer;
+}
+.theme-toggle:hover { background: var(--card-hover); }
+
+.layout { display: flex; padding-top: 48px; }
+.sidebar {
+  width: 240px; position: fixed; left: 0; top: 48px; bottom: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: 32px 24px; overflow-y: auto;
+}
+.sidebar h3 {
+  font-size: 11px; letter-spacing: 0.15em; color: var(--text-muted);
+  text-transform: uppercase; margin-bottom: 16px; font-weight: 500;
+}
+.sidebar ul { list-style: none; }
+.sidebar li { margin-bottom: 8px; }
+.sidebar a {
+  color: var(--text); text-decoration: none; font-size: 13px;
+  display: block; padding: 4px 0; transition: color 0.2s;
+}
+.sidebar a:hover { color: var(--accent-warm); }
+.sidebar a .num { color: var(--text-muted); font-family: var(--font-mono); margin-right: 8px; }
+
+.main {
+  margin-left: 240px; max-width: 880px; padding: 64px 48px;
+  font-family: var(--font-serif);
+}
+.main h1 {
+  font-family: var(--font); font-size: 32px; font-weight: 700;
+  margin-bottom: 8px; letter-spacing: 0.02em;
+}
+.subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 48px; }
+.meta-line {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  margin-bottom: 64px; padding-bottom: 24px; border-bottom: 1px solid var(--border-light);
+}
+
+.chapter-section { margin-bottom: 72px; padding-bottom: 48px; border-bottom: 1px solid var(--border-light); }
+.chapter-section:last-child { border-bottom: none; }
+.chapter-num {
+  font-family: var(--font-mono); font-size: 11px; color: var(--accent-warm);
+  letter-spacing: 0.15em; margin-bottom: 8px; text-transform: uppercase;
+}
+.chapter-title {
+  font-family: var(--font); font-size: 22px; font-weight: 700;
+  margin-bottom: 24px; color: var(--text);
+}
+.main p { margin-bottom: 16px; text-indent: 1em; }
+.main p:first-of-type { text-indent: 0; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px; margin: 32px 0;
+}
+.stat {
+  border: 1px solid var(--border); padding: 16px; background: var(--card);
+}
+.stat-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 8px; }
+.stat-value { font-family: var(--font-mono); font-size: 22px; color: var(--accent-warm); font-weight: 700; }
+.stat-note { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
+
+table {
+  width: 100%; border-collapse: collapse; margin: 24px 0;
+  font-family: var(--font); font-size: 13px;
+}
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); }
+th { background: var(--surface); font-weight: 600; color: var(--text-secondary); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+td.num { font-family: var(--font-mono); text-align: right; color: var(--accent-warm); }
+td.tag { font-family: var(--font-mono); font-size: 11px; }
+
+.timeline {
+  position: relative; margin: 32px 0; padding-left: 32px;
+  border-left: 2px solid var(--accent-warm);
+}
+.epoch { margin-bottom: 32px; position: relative; }
+.epoch::before {
+  content: ""; position: absolute; left: -38px; top: 6px;
+  width: 12px; height: 12px; background: var(--accent-warm); border-radius: 50%;
+}
+.epoch-period {
+  font-family: var(--font-mono); font-size: 11px; color: var(--accent-warm);
+  letter-spacing: 0.1em; margin-bottom: 4px;
+}
+.epoch-title { font-family: var(--font); font-weight: 700; margin-bottom: 4px; }
+.epoch-detail { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+
+.supplement-box {
+  background: var(--surface); border-left: 3px solid var(--accent-warm);
+  padding: 24px 28px; margin: 32px 0;
+}
+.supplement-box h4 {
+  font-family: var(--font); font-size: 14px; letter-spacing: 0.1em;
+  color: var(--accent-warm); margin-bottom: 12px; text-transform: uppercase;
+}
+.svg-container {
+  margin: 32px 0; padding: 24px; background: var(--card);
+  border: 1px solid var(--border); overflow-x: auto;
+}
+.svg-container .caption {
+  font-family: var(--font); font-size: 11px; color: var(--text-muted);
+  margin-top: 12px; text-align: center; letter-spacing: 0.05em;
+}
+.diagram-figno {
+  font-family: var(--font-mono); font-size: 10px; color: var(--accent-warm);
+  letter-spacing: 0.15em; margin-bottom: 4px; text-transform: uppercase;
+}
+.kpi-list { list-style: none; }
+.kpi-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-family: var(--font); font-size: 13px; }
+.kpi-list li:last-child { border-bottom: none; }
+.kpi-status { font-family: var(--font-mono); }
+.pass { color: #1B7F3A; }
+.warn { color: #C77700; }
+
+footer {
+  margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--border);
+  font-family: var(--font); font-size: 11px; color: var(--text-muted);
+}
+
+@media (max-width: 1000px) {
+  .sidebar { position: static; width: 100%; height: auto; padding: 16px 24px; }
+  .main { margin-left: 0; padding: 32px 24px; }
+  .layout { flex-direction: column; }
+}
+@media print {
+  .sidebar, .top-bar, .theme-toggle { display: none; }
+  .main { margin-left: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="top-bar">
+  <div class="brand">HTP-DB · <span class="accent">Human Text Production</span></div>
+  <button class="theme-toggle" onclick="toggleTheme()">DARK</button>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <h3>目次</h3>
+    <ul>
+      <li><a href="#overview"><span class="num">01</span>概要</a></li>
+      <li><a href="#metrics"><span class="num">02</span>主要指標</a></li>
+      <li><a href="#timeline"><span class="num">03</span>テキスト生産の時代</a></li>
+      <li><a href="#regions"><span class="num">04</span>言語圏分布</a></li>
+      <li><a href="#sources"><span class="num">05</span>真実層・出典</a></li>
+      <li><a href="#discrepancies"><span class="num">06</span>乖離の透明化</a></li>
+      <li><a href="#cross-refs"><span class="num">07</span>既存DB接続</a></li>
+      <li><a href="#kpi"><span class="num">08</span>品質ゲート</a></li>
+      <li><a href="#roadmap"><span class="num">09</span>Wave 1-4 完走</a></li>
+      <li><a href="#supplement"><span class="num">補</span>2025 交差点の補論</a></li>
+    </ul>
+  </nav>
+
+  <main class="main">
+    <h1>人類が生成した文字・テキストの量</h1>
+    <p class="subtitle">Human Text Production Database — Wave 1-4 完走 (BC3200-2026)</p>
+    <p class="meta-line">DB ID: htp · Created: 2026-05-15 · Wave: 1-4 完走 · Records: 44 · Cross-refs: 15 · Sources: 18 · Verified: 59.1% · 言語圏: 8/9 カバー</p>
+
+    <section class="chapter-section" id="overview">
+      <div class="chapter-num">Chapter 01</div>
+      <h2 class="chapter-title">概要</h2>
+      <p>HTP-DB は、人類が各時代に生み出した文字・テキストの総量を体系的に推定するデータベースである。楔形文字の発明（紀元前 3200 年頃）から、AI 生成テキストが人間生成テキストと並走しはじめた現代（2022 年以降）までの約 5,200 年を、媒体・言語圏・推定方法ごとに記録する。</p>
+      <p>Wave 1-4 完走により、5,200 年の全期間を被覆した。Wave 1（1450-2026）は印刷とデジタルを Buringh & van Zanden（2009）+ UNESCO + IDC で固める。Wave 2（500-1450）は Buringh（2011）の中世写本期推計を中核に、宋代印刷術と古典イスラム期で三極バランスを取る。Wave 3（BC3200-AD500）は CDLI 楔形文字・Oxyrhynchus パピルス・Perseus/TLG 古典コーパスで古代を埋める。Wave 4 はサンスクリット・マヤ・ゲエズと AI 生成テキスト（2023-）を追加し、欧米中心からの脱却を試みた。</p>
+      <p>このデータベースは、ミラツクが構想する補論「情報生産の 2030-2100」の歴史根拠層として機能する。動詞の転換、すなわち「書き写す → 印刷する → 発信する → 共に生成する」という四段階のシフトを、量的データで裏打ちすることを意図する。Wave 4 で AI 生成テキストが 2025 年に量的に人類のデジタルテキスト総量に並ぶ可能性を示唆する初期推定値を含めた。</p>
+    </section>
+
+    <section class="chapter-section" id="metrics">
+      <div class="chapter-num">Chapter 02</div>
+      <h2 class="chapter-title">主要指標</h2>
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-label">RECORDS</div>
+          <div class="stat-value">44</div>
+          <div class="stat-note">Wave 1-4 完走</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">SOURCES</div>
+          <div class="stat-value">18</div>
+          <div class="stat-note">authority_tier 1: 14 / 2: 4</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">VERIFIED RATE</div>
+          <div class="stat-value">59.1%</div>
+          <div class="stat-note">26 verified / 18 estimated (古代誤差幅大)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">URL LIVE</div>
+          <div class="stat-value">100%</div>
+          <div class="stat-note">18 / 18 verified 2026-05-15</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">CROSS REFS</div>
+          <div class="stat-value">15</div>
+          <div class="stat-note">既存64DB + CLA/FVCP/Megatrend 接続</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">REGIONS</div>
+          <div class="stat-value">8/9</div>
+          <div class="stat-note">欧米中心脱却・全期間カバー</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">期間カバー</div>
+          <div class="stat-value">5,226 年</div>
+          <div class="stat-note">BC3200 〜 AD2026</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">媒体</div>
+          <div class="stat-value">12</div>
+          <div class="stat-note">楔形文字 → AI生成テキスト</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter-section" id="timeline">
+      <div class="chapter-num">Chapter 03</div>
+      <h2 class="chapter-title">テキスト生産の時代</h2>
+      <p>近世から現代までのテキスト生産は、媒体の決定的転換点で爆発的に増えてきた。Buringh & van Zanden の体系的推計と IDC の現代統計を接続すると、生産量はおよそ 14 桁にわたって増加する。</p>
+
+      <div class="timeline">
+        <div class="epoch">
+          <div class="epoch-period">BC3200-BC2000 楔形文字初期</div>
+          <div class="epoch-title">100,000 粘土板</div>
+          <div class="epoch-detail">シュメール初期王朝期。CDLI カタログ収録分。最初期の行政記録と神話記述。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">BC800-BC300 古典ギリシア</div>
+          <div class="epoch-title">32,100,000 語</div>
+          <div class="epoch-detail">Perseus Digital Library 収録の現存ギリシア語コーパス。Homer/Plato/Aristotle/悲劇/歴史記述。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">BC200-AD500 古典ラテン</div>
+          <div class="epoch-title">16,300,000 語</div>
+          <div class="epoch-detail">Perseus 収録の現存ラテン語コーパス。共和制末期からアウグストゥス時代、ローマ帝国全期、古代末期まで。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">9世紀 カロリング・ルネサンス</div>
+          <div class="epoch-title">91,000 写本 / 100年</div>
+          <div class="epoch-detail">Buringh 2011 の中世写本生産モデル推計のピーク前期。シャルルマーニュ復興の成果。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">12世紀 12世紀ルネサンス</div>
+          <div class="epoch-title">768,000 写本 / 100年</div>
+          <div class="epoch-detail">11世紀の5.7倍へ急増。アリストテレス受容、大学誕生、スコラ哲学準備期。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">960-1279 宋代</div>
+          <div class="epoch-title">5,000,000 印刷本</div>
+          <div class="epoch-detail">中国で木版印刷が技術として確立。グーテンベルクの 250 年前に商業印刷を実現。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">14世紀 紙写本期</div>
+          <div class="epoch-title">2,747,000 写本 / 100年</div>
+          <div class="epoch-detail">羊皮紙から紙へ。複製コストが下がり、ペスト後も生産は減少しなかった。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">15世紀 写本期末</div>
+          <div class="epoch-title">5,000,000 写本 / 100年</div>
+          <div class="epoch-detail">欧州ラテン圏の紙写本生産。修道院・写字室の最盛期。Buringh の生産モデル推計。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">1454-1500 揺籃期</div>
+          <div class="epoch-title">12,500,000 印刷本</div>
+          <div class="epoch-detail">グーテンベルク活版以降の初期 46 年。ISTC（インキュナブラ・カタログ）由来の verified データ。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">16世紀</div>
+          <div class="epoch-title">217,000,000 印刷本</div>
+          <div class="epoch-detail">100 年で前期の 17 倍。宗教改革と出版産業の急成長。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">17世紀</div>
+          <div class="epoch-title">545,000,000 印刷本</div>
+          <div class="epoch-detail">科学革命期。学術出版が急増。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">18世紀</div>
+          <div class="epoch-title">1,000,000,000 印刷本</div>
+          <div class="epoch-detail">啓蒙時代。10 億冊（推定）に到達。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">20世紀</div>
+          <div class="epoch-title">70,000,000 ユニーク書名</div>
+          <div class="epoch-detail">UNESCO + Google Books による現代累計。新聞・雑誌は別系統。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2010</div>
+          <div class="epoch-title">1.2 ゼタバイト / 年</div>
+          <div class="epoch-detail">IDC Global DataSphere。デジタルデータ全体（テキスト以外含む）。1 ZB = 10²¹ バイト。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2020</div>
+          <div class="epoch-title">64.2 ZB / 年</div>
+          <div class="epoch-detail">10 年で 53 倍。スマートフォン・SNS・IoT 普及。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2023</div>
+          <div class="epoch-title">120 ZB / 年</div>
+          <div class="epoch-detail">ChatGPT 公開後の初年。AI 生成テキストの量的記録が始まる。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2025（予測）</div>
+          <div class="epoch-title">150-200 ZB / 年</div>
+          <div class="epoch-detail">IDC 予測。範囲表示は推定下限・上限を保持する設計（楽観バイアス警告付き）。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2023 AI 生成テキスト初年</div>
+          <div class="epoch-title">100-2,000 兆 tokens</div>
+          <div class="epoch-detail">ChatGPT 公開後の初年。AI 生成テキストの量的記録が始まる。推定幅は極めて広い（gta_status=estimated, confidence_band=very_wide）。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2025（予測）AI 生成テキスト</div>
+          <div class="epoch-title">1-20 京 tokens</div>
+          <div class="epoch-detail">人類のデジタルテキスト総量に量的に並ぶ可能性。情報生産における動詞「共に生成する」が定着する境界年。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter-section" id="regions">
+      <div class="chapter-num">Chapter 04</div>
+      <h2 class="chapter-title">言語圏分布</h2>
+      <p>欧米中心ソースに依存することの再発防止として、9 言語圏を独立カラムで管理し、起動時に欧米偏重を検出して WARN を発出する設計にした。Wave 1 では 5 圏のみカバーされており、未カバー 4 圏は Wave 2-3 で補完する。</p>
+
+      <table>
+        <thead><tr><th>言語圏</th><th>主要言語</th><th>Coverage</th><th>主データ</th></tr></thead>
+        <tbody>
+          <tr><td>欧州ラテン圏</td><td>lat / fra / ita / spa / eng / deu</td><td class="tag pass">充足</td><td>Buringh 2011 中世 + Buringh 2009 印刷 + Perseus Latin</td></tr>
+          <tr><td>欧州非ラテン圏</td><td>grc / rus / pol / ces / ell</td><td class="tag pass">充足</td><td>Perseus + TLG ギリシア語コーパス</td></tr>
+          <tr><td>漢字圏</td><td>zho / jpn / kor / vie</td><td class="tag pass">充足</td><td>Sinica + 唐宋元明（永楽大典含む）</td></tr>
+          <tr><td>アラビア・イスラム圏</td><td>ara / fas / tur / urd</td><td class="tag pass">充足</td><td>Shamela + 古典・後古典イスラム期</td></tr>
+          <tr><td>南アジア</td><td>san / hin / ben / tam</td><td class="tag warn">部分</td><td>SARIT + GRETIL Sanskrit 推定</td></tr>
+          <tr><td>メソアメリカ</td><td>myn / nci</td><td class="tag warn">部分</td><td>Coe & Van Stone Maya 推定（誤差幅大）</td></tr>
+          <tr><td>アフリカ固有圏</td><td>amh / gez / swa</td><td class="tag warn">部分</td><td>Ge'ez 30K + エジプト ヒエログリフ・パピルス</td></tr>
+          <tr><td>アメリカ大陸（近代）</td><td>eng / spa / por</td><td class="tag pass">充足</td><td>UNESCO / IDC グローバル集計に含む</td></tr>
+          <tr><td>グローバル合計</td><td>—</td><td class="tag pass">充足</td><td>Hilbert-Lopez 2011 + IDC + UNESCO + AI 生成</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="sources">
+      <div class="chapter-num">Chapter 05</div>
+      <h2 class="chapter-title">真実層・出典</h2>
+      <p>複数の推定モデルが食い違うとき、結論を 1 つに収束させるのではなく、層別固定と差分注記で透明性を保つ。Buringh、IDC、UNESCO を期間別に正本とし、補助ソースは別 tier で記録する。</p>
+
+      <table>
+        <thead><tr><th>ソース</th><th>カバー期間</th><th>Tier</th><th>License</th><th>Live</th></tr></thead>
+        <tbody>
+          <tr><td>Buringh & van Zanden (2009)</td><td>500-1800</td><td class="tag">1</td><td>Academic</td><td class="tag pass">✓</td></tr>
+          <tr><td>IDC Global DataSphere</td><td>1986-2026</td><td class="tag">1</td><td>Proprietary (free summary)</td><td class="tag pass">✓</td></tr>
+          <tr><td>UNESCO UIS Books</td><td>1950-2024</td><td class="tag">1</td><td>UNESCO Open</td><td class="tag pass">✓</td></tr>
+          <tr><td>Sinica 漢籍</td><td>antiquity-18c</td><td class="tag">1</td><td>Free domestic</td><td class="tag pass">✓</td></tr>
+          <tr><td>Shamela (peer-reviewed)</td><td>7c-modern</td><td class="tag">1</td><td>Free non-commercial</td><td class="tag pass">✓</td></tr>
+          <tr><td>CDLI Cuneiform</td><td>BC3350-AD0</td><td class="tag">1</td><td>CC BY-SA 4.0</td><td class="tag pass">✓</td></tr>
+          <tr><td>OWID Books</td><td>1451-2024</td><td class="tag">2</td><td>CC BY 4.0</td><td class="tag pass">✓</td></tr>
+          <tr><td>Febvre & Martin (1958)</td><td>1450-1800</td><td class="tag">2</td><td>Academic</td><td class="tag pass">✓</td></tr>
+          <tr><td>Eisenstein (1979)</td><td>1460-1800</td><td class="tag">2</td><td>Academic</td><td class="tag pass">✓</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="discrepancies">
+      <div class="chapter-num">Chapter 06</div>
+      <h2 class="chapter-title">乖離の透明化</h2>
+      <p>ソース間の不一致は、どちらかを「正解」と決めずに、専用テーブルに乖離として記録する。書き換えではなく繋ぐ。Wave 1 では 2 件を記録した。</p>
+      <table>
+        <thead><tr><th>期間</th><th>Source A</th><th>Source B</th><th>解決方針</th></tr></thead>
+        <tbody>
+          <tr><td>1986 baseline</td><td>IDC: 2.6 EB</td><td>UNESCO: —</td><td class="tag">no_consensus（単位非互換）</td></tr>
+          <tr><td>17-18c Europe</td><td>Buringh: 1B 印刷本</td><td>Febvre-Martin: 物語埋込</td><td class="tag">adopt_a（系統的表化）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="cross-refs">
+      <div class="chapter-num">Chapter 07</div>
+      <h2 class="chapter-title">既存DB接続 15件</h2>
+      <p>新規 DB は単独で完成させない。生態系として組み込むことを起点に設計した。Wave 1 で 10 件、Wave 4 で 5 件追加し、合計 15 件の cross-ref を既存 64 DB と構築済み。</p>
+      <table>
+        <thead><tr><th>DB</th><th>接続キー</th><th>関係</th><th>note</th></tr></thead>
+        <tbody>
+          <tr><td class="tag">TA</td><td>year</td><td class="tag">supports</td><td>印刷・デジタル加速がテキスト量増加と対応</td></tr>
+          <tr><td class="tag">CDH</td><td>medium × year</td><td class="tag">supports</td><td>印刷コスト逓減がテキスト量増加の駆動因</td></tr>
+          <tr><td class="tag">CI</td><td>language_region</td><td class="tag">extends</td><td>言語圏別文化生産との照合</td></tr>
+          <tr><td class="tag">SI</td><td>year × medium</td><td class="tag">supports</td><td>印刷革命・電信・インターネットが SI 通信革命と重複</td></tr>
+          <tr><td class="tag">MG</td><td>concept</td><td class="tag">extends</td><td>知識経済・McLuhan 媒体理論の基盤</td></tr>
+          <tr><td class="tag">PESTLE</td><td>year × region</td><td class="tag">contradicts</td><td>検閲イベントが量減少と対応（反証事例）</td></tr>
+          <tr><td class="tag">UPR</td><td>year</td><td class="tag">extends</td><td>学術テキストの現代部分を補完</td></tr>
+          <tr><td class="tag">TK</td><td>language_region</td><td class="tag">extends</td><td>非文字圏の明示（口承文化）</td></tr>
+          <tr><td class="tag">GC-DB</td><td>concept</td><td class="tag">supports</td><td>Romer 型知識スピルオーバーの量的基盤</td></tr>
+          <tr><td class="tag">FTT-DB v2</td><td>year × technology</td><td class="tag">supports</td><td>AI 生成テキスト出現 2022 の転換点</td></tr>
+          <tr><td class="tag">CLA</td><td>year × paradigm</td><td class="tag">supports</td><td>1454/1991/2022 を CLA 因果階層分析のパラダイム転換点として接続</td></tr>
+          <tr><td class="tag">SI-Framework</td><td>year × medium</td><td class="tag">supports</td><td>グーテンベルク・電信・インターネット・AI 生成の 4 構造的通信転換</td></tr>
+          <tr><td class="tag">Megatrend</td><td>concept:ai_text</td><td class="tag">extends</td><td>AI 生成テキストを新メガトレンド軸として量的に裏付け</td></tr>
+          <tr><td class="tag">FVCP</td><td>theme:information_production</td><td class="tag">supports</td><td>補論「情報生産の 2030-2100」の歴史根拠層として機能</td></tr>
+          <tr><td class="tag">Manufacturing-Orchestra</td><td>theme:orchestra</td><td class="tag">mirrors</td><td>製造補論との動詞転換並走（育てる/共に生成する）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="kpi">
+      <div class="chapter-num">Chapter 08</div>
+      <h2 class="chapter-title">品質ゲート</h2>
+      <p>件数を成果指標にしない。検証通過率・URL live 率・cross_refs 件数の三本柱を KPI とする。</p>
+      <ul class="kpi-list">
+        <li><span>verified_rate（全期間）</span><span class="kpi-status warn">59.1%（古代 estimated 18 件含む）</span></li>
+        <li><span>verified_rate（Wave 1-2 近世以降）</span><span class="kpi-status pass">80.6% 近世以降は高品質</span></li>
+        <li><span>source_url_live_rate</span><span class="kpi-status pass">100% PASS (18/18)</span></li>
+        <li><span>cross_refs ≥ 10</span><span class="kpi-status pass">15 PASS（CLA/FVCP/Megatrend/Manufacturing 追加）</span></li>
+        <li><span>estimation_traceability（推定値の出典追跡率）</span><span class="kpi-status pass">100% PASS</span></li>
+        <li><span>abstain 明示</span><span class="kpi-status pass">2 件記録（unit非互換 + Maya 範囲）</span></li>
+        <li><span>言語圏 coverage</span><span class="kpi-status pass">8/9 圏（Wave 4 で目標達成）</span></li>
+        <li><span>期間カバー</span><span class="kpi-status pass">5,226 年（BC3200-2026）</span></li>
+      </ul>
+    </section>
+
+    <section class="chapter-section" id="roadmap">
+      <div class="chapter-num">Chapter 09</div>
+      <h2 class="chapter-title">Wave 1-4 完走と Wave 5+ 想定</h2>
+      <p>Wave 1-4 の四段階で BC3200 から AD2026 までの 5,226 年を被覆した。Wave 5 以降は深化のフェーズに入る。年代別誤差幅の縮小、AI 生成テキストの精密化、補論「情報生産の 2030-2100」との双方向統合が次の焦点である。</p>
+      <table>
+        <thead><tr><th>Wave</th><th>スコープ</th><th>状態</th><th>主データ</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>近世以降 1450-2026</td><td class="tag pass">完走</td><td>Buringh & van Zanden + IDC + UNESCO + Sinica + Shamela</td></tr>
+          <tr><td>2</td><td>中世 500-1450</td><td class="tag pass">完走</td><td>Buringh 2011 + 宋代印刷 + 古典イスラム</td></tr>
+          <tr><td>3</td><td>古代 BC3200-AD500</td><td class="tag pass">完走</td><td>CDLI 楔形文字 + Oxyrhynchus + Perseus/TLG + エジプト</td></tr>
+          <tr><td>4</td><td>言語圏拡張 + AI時代</td><td class="tag pass">完走</td><td>SARIT + Maya + Ge'ez + AI 2023-2025 + FVCP 統合</td></tr>
+          <tr><td>5</td><td>誤差幅縮小 + 深化</td><td>想定</td><td>Wave 4 estimated レコードの一次ソース照合</td></tr>
+          <tr><td>6</td><td>動詞転換補論統合</td><td>想定</td><td>「情報生産の 2030-2100」FVCP 起動と双方向反映</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="supplement">
+      <div class="chapter-num">補論</div>
+      <h2 class="chapter-title">2025 交差点の補論 — 「共に生成する」が定着する境界年</h2>
+      <p>本章は、HTP-DB Wave 4 に格納された「2025 年 AI 生成テキスト 1-20 京 tokens」という当初推定を、Epoch AI と OpenAI 公式統計を一次照合した結果として書き直したものである。結論を先に述べると、当初の「1-20 京」という数字は文脈なしには両義的であり、API 消費量と実生成量を区別すれば、それぞれ妥当な範囲が異なる。</p>
+
+      <p>研究検証の結果、2025 年における AI 生成テキストの量的全体像は、三つの層に分けて理解する必要がある。第一に、OpenAI / Anthropic / Google 等の API が処理した推論時 tokens 総量は、年間およそ 120-180 京（1.2×10¹⁷ - 1.8×10¹⁷）tokens に達する。これは OpenAI 単体の公式統計 1.5B tokens/min と OpenRouter の集約値から推算した値であり、信頼度は中程度である。第二に、AI が新規に生成し外部へ持続的に投稿された unique なテキスト量は、Epoch AI のデータ稀少性モデルからの推算で年間 500 兆-5,000 兆 tokens（5×10¹⁴ - 5×10¹⁵）とおおむね 100 倍小さい。第三に、人類が文字を発明してから 2024 年までに蓄積した累積テキスト総量は、Epoch AI が 300 兆 tokens（信頼区間 100-1,000 兆）と推計している。三つの層は数桁ずれており、「人類超過」を語るときに、どの層を比較しているかが命運を決める。</p>
+
+      <div class="supplement-box">
+        <h4>研究検証の要点</h4>
+        <p>「1-20 京 tokens」は API 消費量と読めば妥当（中央値 1.5×10¹⁷）、実生成テキスト量と読めば過大（実際は 10¹⁵ 程度）。当初 HTP-DB seed は両者を混同していたため、Wave 4.5 で API 消費量と unique 生成量を別レコードに分離し、`htp_source_discrepancies` にギャップ比率 150 倍を明示した。これは path-1 真実層の原則（結論を 1 つに収束せず、層別固定で繋ぐ）の実装例である。</p>
+      </div>
+
+      <h3 style="font-family:var(--font);font-size:17px;margin:32px 0 12px 0;">図解 補-1 動詞転換の 4 時代パネル</h3>
+      <div class="svg-container">
+        <div class="diagram-figno">FIG. 補-1</div>
+        <svg viewBox="0 0 760 320" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .panel-title { font: 600 13px "Noto Sans JP"; fill: #CC1400; }
+            .panel-verb { font: 700 22px "Noto Serif JP"; fill: #121212; }
+            .panel-era { font: 500 11px "Noto Sans JP"; fill: #555555; }
+            .panel-detail { font: 11px "Noto Sans JP"; fill: #555555; }
+            .arrow { stroke: #CC1400; stroke-width: 1.5; fill: none; }
+          </style>
+          <rect x="20" y="40" width="170" height="240" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+          <rect x="200" y="40" width="170" height="240" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+          <rect x="380" y="40" width="170" height="240" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+          <rect x="560" y="40" width="180" height="240" fill="none" stroke="#CC1400" stroke-width="2"/>
+
+          <text x="105" y="65" class="panel-title" text-anchor="middle">写本期</text>
+          <text x="105" y="120" class="panel-verb" text-anchor="middle">書き写す</text>
+          <text x="105" y="155" class="panel-era" text-anchor="middle">~ 1450</text>
+          <text x="105" y="195" class="panel-detail" text-anchor="middle">9c 91K 写本</text>
+          <text x="105" y="215" class="panel-detail" text-anchor="middle">12c 768K 写本</text>
+          <text x="105" y="235" class="panel-detail" text-anchor="middle">14c 2.75M 写本</text>
+          <text x="105" y="265" class="panel-detail" text-anchor="middle" fill="#CC1400">修道院 / 写字室</text>
+
+          <text x="285" y="65" class="panel-title" text-anchor="middle">印刷期</text>
+          <text x="285" y="120" class="panel-verb" text-anchor="middle">印刷する</text>
+          <text x="285" y="155" class="panel-era" text-anchor="middle">1450 - 1985</text>
+          <text x="285" y="195" class="panel-detail" text-anchor="middle">16c 217M 本</text>
+          <text x="285" y="215" class="panel-detail" text-anchor="middle">18c 1B 本</text>
+          <text x="285" y="235" class="panel-detail" text-anchor="middle">20c 70M 書名</text>
+          <text x="285" y="265" class="panel-detail" text-anchor="middle" fill="#CC1400">出版社 / 新聞社</text>
+
+          <text x="465" y="65" class="panel-title" text-anchor="middle">デジタル期</text>
+          <text x="465" y="120" class="panel-verb" text-anchor="middle">発信する</text>
+          <text x="465" y="155" class="panel-era" text-anchor="middle">1985 - 2022</text>
+          <text x="465" y="195" class="panel-detail" text-anchor="middle">1986: 2.6 EB</text>
+          <text x="465" y="215" class="panel-detail" text-anchor="middle">2020: 64 ZB</text>
+          <text x="465" y="235" class="panel-detail" text-anchor="middle">2023: 120 ZB</text>
+          <text x="465" y="265" class="panel-detail" text-anchor="middle" fill="#CC1400">プラットフォーム</text>
+
+          <text x="650" y="65" class="panel-title" text-anchor="middle">AI 共生期</text>
+          <text x="650" y="120" class="panel-verb" text-anchor="middle">共に生成する</text>
+          <text x="650" y="155" class="panel-era" text-anchor="middle">2022 - 2100</text>
+          <text x="650" y="195" class="panel-detail" text-anchor="middle">API 1.5×10¹⁷</text>
+          <text x="650" y="215" class="panel-detail" text-anchor="middle">生成 10¹⁵</text>
+          <text x="650" y="235" class="panel-detail" text-anchor="middle">Web 52% AI</text>
+          <text x="650" y="265" class="panel-detail" text-anchor="middle" fill="#CC1400">LLM / 人間協働</text>
+
+          <path d="M 192 160 L 198 160" class="arrow" marker-end="url(#a1)"/>
+          <path d="M 372 160 L 378 160" class="arrow" marker-end="url(#a1)"/>
+          <path d="M 552 160 L 558 160" class="arrow" marker-end="url(#a1)"/>
+          <defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L6,4 L0,8 z" fill="#CC1400"/></marker></defs>
+
+          <text x="380" y="20" font="600 12px 'Noto Sans JP'" fill="#121212" text-anchor="middle">動詞転換 4 時代パネル — 媒体の主役は時代ごとに変わる</text>
+        </svg>
+        <div class="caption">FIG. 補-1: 書き写す → 印刷する → 発信する → 共に生成する の 4 段階。出典: HTP-DB Wave 1-4 集約値。</div>
+      </div>
+
+      <h3 style="font-family:var(--font);font-size:17px;margin:32px 0 12px 0;">図解 補-2 5,000 年テキスト生産量の対数推移</h3>
+      <div class="svg-container">
+        <div class="diagram-figno">FIG. 補-2</div>
+        <svg viewBox="0 0 760 340" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .axis { stroke: #555555; stroke-width: 1; }
+            .grid { stroke: #EEEEEE; stroke-width: 1; }
+            .axis-label { font: 11px "Noto Sans JP"; fill: #555555; }
+            .data-line { stroke: #CC1400; stroke-width: 2; fill: none; }
+            .data-point { fill: #CC1400; }
+            .ai-line { stroke: #555555; stroke-width: 2; stroke-dasharray: 4 3; fill: none; }
+            .annotation { font: 600 10px "Noto Sans JP"; fill: #121212; }
+            .era-label { font: 11px "Noto Sans JP"; fill: #555555; }
+          </style>
+          <!-- axes -->
+          <line x1="60" y1="290" x2="730" y2="290" class="axis"/>
+          <line x1="60" y1="40" x2="60" y2="290" class="axis"/>
+          <!-- log y grid -->
+          <line x1="60" y1="60" x2="730" y2="60" class="grid"/>
+          <line x1="60" y1="100" x2="730" y2="100" class="grid"/>
+          <line x1="60" y1="140" x2="730" y2="140" class="grid"/>
+          <line x1="60" y1="180" x2="730" y2="180" class="grid"/>
+          <line x1="60" y1="220" x2="730" y2="220" class="grid"/>
+          <line x1="60" y1="260" x2="730" y2="260" class="grid"/>
+
+          <text x="55" y="63" class="axis-label" text-anchor="end">10¹⁸</text>
+          <text x="55" y="103" class="axis-label" text-anchor="end">10¹⁵</text>
+          <text x="55" y="143" class="axis-label" text-anchor="end">10¹²</text>
+          <text x="55" y="183" class="axis-label" text-anchor="end">10⁹</text>
+          <text x="55" y="223" class="axis-label" text-anchor="end">10⁶</text>
+          <text x="55" y="263" class="axis-label" text-anchor="end">10³</text>
+
+          <text x="100" y="305" class="axis-label" text-anchor="middle">BC3000</text>
+          <text x="220" y="305" class="axis-label" text-anchor="middle">AD500</text>
+          <text x="340" y="305" class="axis-label" text-anchor="middle">1000</text>
+          <text x="460" y="305" class="axis-label" text-anchor="middle">1500</text>
+          <text x="580" y="305" class="axis-label" text-anchor="middle">1900</text>
+          <text x="700" y="305" class="axis-label" text-anchor="middle">2025</text>
+
+          <!-- HTP human curve: BC3200 (10^5) → AD500 (10^7) → 1000 (10^7) → 1450 (10^9) → 1800 (10^11) → 2024 (10^14) -->
+          <polyline points="80,254 200,234 340,210 460,180 580,140 700,100" class="data-line"/>
+          <circle cx="80" cy="254" r="3" class="data-point"/>
+          <circle cx="200" cy="234" r="3" class="data-point"/>
+          <circle cx="340" cy="210" r="3" class="data-point"/>
+          <circle cx="460" cy="180" r="3" class="data-point"/>
+          <circle cx="580" cy="140" r="3" class="data-point"/>
+          <circle cx="700" cy="100" r="3" class="data-point"/>
+
+          <!-- AI line: 2022 (0) → 2025 unique 10^15 → 2025 API 10^17 -->
+          <line x1="690" y1="290" x2="700" y2="80" class="ai-line"/>
+          <circle cx="700" cy="80" r="4" fill="#121212"/>
+
+          <text x="700" y="72" class="annotation" text-anchor="end">2025 API 10¹⁷</text>
+          <text x="700" y="115" class="annotation" text-anchor="end">2025 生成 10¹⁵</text>
+          <text x="690" y="295" class="annotation" text-anchor="end">2022 出現</text>
+
+          <text x="105" y="252" class="era-label">楔形文字</text>
+          <text x="225" y="232" class="era-label">パピルス/写本</text>
+          <text x="345" y="208" class="era-label">中世写本</text>
+          <text x="465" y="178" class="era-label">活版印刷</text>
+          <text x="585" y="138" class="era-label">新聞/出版</text>
+
+          <text x="395" y="25" class="annotation" text-anchor="middle">人類テキスト生産は 5,200 年で 14 桁増加、2022 以降 AI が並走</text>
+        </svg>
+        <div class="caption">FIG. 補-2: 累積テキスト生産量の対数推移。実線=人類生成、破線=AI 生成。出典: HTP-DB Wave 1-4 + Epoch AI 2024。</div>
+      </div>
+
+      <h3 style="font-family:var(--font);font-size:17px;margin:32px 0 12px 0;">図解 補-3 三層スタック — API消費 / 新規生成 / 累積ストック</h3>
+      <div class="svg-container">
+        <div class="diagram-figno">FIG. 補-3</div>
+        <svg viewBox="0 0 760 280" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .layer-title { font: 700 13px "Noto Sans JP"; fill: #121212; }
+            .layer-num { font: 600 14px "Fira Code"; fill: #CC1400; }
+            .layer-desc { font: 11px "Noto Sans JP"; fill: #555555; }
+            .ratio { font: 600 11px "Fira Code"; fill: #CC1400; }
+          </style>
+          <!-- API consumption layer: largest -->
+          <rect x="100" y="40" width="560" height="60" fill="#CC1400" fill-opacity="0.12" stroke="#CC1400" stroke-width="1.5"/>
+          <text x="120" y="68" class="layer-title">API 消費量（推論時 tokens）</text>
+          <text x="120" y="88" class="layer-desc">OpenAI + Anthropic + Google + others 2025</text>
+          <text x="640" y="65" class="layer-num" text-anchor="end">1.5 × 10¹⁷</text>
+          <text x="640" y="85" class="ratio" text-anchor="end">基準 × 1</text>
+
+          <!-- Unique generation layer: 100x smaller -->
+          <rect x="180" y="115" width="400" height="55" fill="#CC1400" fill-opacity="0.30" stroke="#CC1400" stroke-width="1.5"/>
+          <text x="200" y="143" class="layer-title">新規生成 unique テキスト</text>
+          <text x="200" y="160" class="layer-desc">RAG / system prompt / 重複除外後</text>
+          <text x="560" y="140" class="layer-num" text-anchor="end">1.0 × 10¹⁵</text>
+          <text x="560" y="160" class="ratio" text-anchor="end">÷ 150</text>
+
+          <!-- Cumulative human stock: even smaller -->
+          <rect x="260" y="185" width="240" height="55" fill="#CC1400" fill-opacity="0.55" stroke="#CC1400" stroke-width="1.5"/>
+          <text x="280" y="213" class="layer-title">累積人類テキスト総量</text>
+          <text x="280" y="230" class="layer-desc">2024 までの全質保証済み (Epoch AI)</text>
+          <text x="480" y="210" class="layer-num" text-anchor="end">3.0 × 10¹⁴</text>
+          <text x="480" y="230" class="ratio" text-anchor="end">÷ 500</text>
+
+          <text x="380" y="25" class="layer-title" text-anchor="middle" style="font-size:13px;">三層を区別すれば「1-20 京 tokens」の真偽が分かる</text>
+          <text x="380" y="265" class="layer-desc" text-anchor="middle">API 消費量は新規生成量の約 150 倍、累積ストックの約 500 倍。比較する層を間違えると結論が反転する</text>
+        </svg>
+        <div class="caption">FIG. 補-3: 三層スタック。出典: OpenAI State of Enterprise AI 2025 + Epoch AI 2024。</div>
+      </div>
+
+      <h3 style="font-family:var(--font);font-size:17px;margin:32px 0 12px 0;">図解 補-4 「人類超過」交差点の限定的妥当性</h3>
+      <div class="svg-container">
+        <div class="diagram-figno">FIG. 補-4</div>
+        <svg viewBox="0 0 760 320" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .ax { stroke: #555555; stroke-width: 1; }
+            .grid2 { stroke: #EEEEEE; stroke-width: 1; }
+            .lbl { font: 11px "Noto Sans JP"; fill: #555555; }
+            .human-fill { fill: #555555; fill-opacity: 0.18; stroke: #555555; stroke-width: 1.5; }
+            .ai-fill { fill: #CC1400; fill-opacity: 0.30; stroke: #CC1400; stroke-width: 1.5; }
+            .pct { font: 700 13px "Fira Code"; fill: #121212; }
+            .ctx-title { font: 600 12px "Noto Sans JP"; fill: #121212; }
+            .ctx-note { font: 10px "Noto Sans JP"; fill: #555555; }
+          </style>
+          <!-- Two contexts side by side -->
+          <text x="190" y="35" class="ctx-title" text-anchor="middle">新規 Web 記事 (2025 年 5 月測定)</text>
+          <text x="570" y="35" class="ctx-title" text-anchor="middle">累積テキストストック (2024)</text>
+
+          <!-- Left chart: new web articles -->
+          <rect x="80" y="60" width="220" height="220" fill="none" stroke="#D9D9D9"/>
+          <!-- AI 52% top -->
+          <rect x="80" y="60" width="220" height="114" class="ai-fill"/>
+          <rect x="80" y="174" width="220" height="106" class="human-fill"/>
+          <text x="190" y="125" class="pct" text-anchor="middle">AI 52%</text>
+          <text x="190" y="230" class="pct" text-anchor="middle">人間 48%</text>
+          <text x="190" y="295" class="ctx-note" text-anchor="middle">Graphite n=65,000 記事 / MIT 予測 64% by 2026</text>
+
+          <!-- Right chart: cumulative stock -->
+          <rect x="460" y="60" width="220" height="220" fill="none" stroke="#D9D9D9"/>
+          <!-- AI 15% top -->
+          <rect x="460" y="60" width="220" height="33" class="ai-fill"/>
+          <rect x="460" y="93" width="220" height="187" class="human-fill"/>
+          <text x="570" y="80" class="pct" text-anchor="middle">AI 15%</text>
+          <text x="570" y="190" class="pct" text-anchor="middle">人間 85%</text>
+          <text x="570" y="295" class="ctx-note" text-anchor="middle">Epoch AI 300T tokens 基準 / 推算</text>
+
+          <!-- Arrow between -->
+          <path d="M 310 170 Q 380 100 450 170" fill="none" stroke="#CC1400" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#a2)"/>
+          <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L6,4 L0,8 z" fill="#CC1400"/></marker></defs>
+          <text x="380" y="95" class="ctx-note" text-anchor="middle" fill="#CC1400">同じ「2025」でも文脈で結論が反転</text>
+        </svg>
+        <div class="caption">FIG. 補-4: 「人類超過」の限定的妥当性。新規フローでは超過、累積ストックでは依然 1:6。</div>
+      </div>
+
+      <h3 style="font-family:var(--font);font-size:17px;margin:32px 0 12px 0;">図解 補-5 不確実性帯（信頼度評価）</h3>
+      <div class="svg-container">
+        <div class="diagram-figno">FIG. 補-5</div>
+        <svg viewBox="0 0 760 280" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .est-bar-band { fill: #CC1400; fill-opacity: 0.15; stroke: #CC1400; stroke-width: 1; }
+            .est-bar-central { stroke: #CC1400; stroke-width: 2; }
+            .est-label { font: 600 11px "Noto Sans JP"; fill: #121212; }
+            .est-value { font: 11px "Fira Code"; fill: #555555; }
+            .conf-high { fill: #1B7F3A; }
+            .conf-med { fill: #C77700; }
+            .conf-low { fill: #CC1400; }
+            .conf-label { font: 600 10px "Noto Sans JP"; fill: #FFFFFF; }
+          </style>
+          <text x="380" y="25" class="est-label" text-anchor="middle" style="font-size:13px;">主要 5 推定値の不確実性帯と信頼度</text>
+
+          <!-- Layout: row per estimate -->
+          <!-- 1. Buringh 17c print -->
+          <text x="20" y="65" class="est-label">17c 印刷本 (Buringh)</text>
+          <rect x="240" y="55" width="80" height="14" class="est-bar-band"/>
+          <line x1="280" y1="55" x2="280" y2="69" class="est-bar-central"/>
+          <text x="600" y="65" class="est-value">5.45 × 10⁸ 本</text>
+          <rect x="680" y="55" width="60" height="14" class="conf-high"/>
+          <text x="710" y="65" class="conf-label" text-anchor="middle">HIGH</text>
+
+          <!-- 2. IDC 2023 -->
+          <text x="20" y="105" class="est-label">2023 デジタル (IDC)</text>
+          <rect x="280" y="95" width="60" height="14" class="est-bar-band"/>
+          <line x1="310" y1="95" x2="310" y2="109" class="est-bar-central"/>
+          <text x="600" y="105" class="est-value">120 ZB</text>
+          <rect x="680" y="95" width="60" height="14" class="conf-high"/>
+          <text x="710" y="105" class="conf-label" text-anchor="middle">HIGH</text>
+
+          <!-- 3. Human cumulative -->
+          <text x="20" y="145" class="est-label">人類累積 (Epoch AI)</text>
+          <rect x="220" y="135" width="200" height="14" class="est-bar-band"/>
+          <line x1="320" y1="135" x2="320" y2="149" class="est-bar-central"/>
+          <text x="600" y="145" class="est-value">100T - 1,000T tokens</text>
+          <rect x="680" y="135" width="60" height="14" class="conf-med"/>
+          <text x="710" y="145" class="conf-label" text-anchor="middle">MED</text>
+
+          <!-- 4. AI API 2025 -->
+          <text x="20" y="185" class="est-label">AI API 消費 2025</text>
+          <rect x="340" y="175" width="80" height="14" class="est-bar-band"/>
+          <line x1="380" y1="175" x2="380" y2="189" class="est-bar-central"/>
+          <text x="600" y="185" class="est-value">120 - 180 × 10¹⁵</text>
+          <rect x="680" y="175" width="60" height="14" class="conf-med"/>
+          <text x="710" y="185" class="conf-label" text-anchor="middle">MED</text>
+
+          <!-- 5. AI unique gen 2025 -->
+          <text x="20" y="225" class="est-label">AI 新規生成 2025</text>
+          <rect x="260" y="215" width="200" height="14" class="est-bar-band"/>
+          <line x1="360" y1="215" x2="360" y2="229" class="est-bar-central"/>
+          <text x="600" y="225" class="est-value">5×10¹⁴ - 5×10¹⁵</text>
+          <rect x="680" y="215" width="60" height="14" class="conf-low"/>
+          <text x="710" y="225" class="conf-label" text-anchor="middle">LOW</text>
+
+          <!-- legend -->
+          <text x="380" y="265" class="est-value" text-anchor="middle">帯 = 推定範囲、縦線 = 中央値、右端 = 信頼度（HIGH/MED/LOW）</text>
+        </svg>
+        <div class="caption">FIG. 補-5: 推定値の信頼度。古いほど狭い帯、新しいほど広い帯。AI 新規生成は最も不確実。</div>
+      </div>
+
+      <h3 style="font-family:var(--font);font-size:17px;margin:32px 0 12px 0;">図解 補-6 ミラツク事業含意マトリクス</h3>
+      <div class="svg-container">
+        <div class="diagram-figno">FIG. 補-6</div>
+        <svg viewBox="0 0 760 320" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+          <style>
+            .quad-box { fill: none; stroke: #D9D9D9; stroke-width: 1; }
+            .quad-active { fill: #CC1400; fill-opacity: 0.05; stroke: #CC1400; stroke-width: 1.5; }
+            .quad-title { font: 700 12px "Noto Sans JP"; fill: #CC1400; }
+            .quad-detail { font: 11px "Noto Sans JP"; fill: #555555; }
+            .axis-ttl { font: 600 11px "Noto Sans JP"; fill: #121212; }
+          </style>
+          <text x="380" y="25" class="axis-ttl" text-anchor="middle" style="font-size:13px;">2025-2030 でミラツク事業に含意があるテキスト生産シナリオ</text>
+          <!-- 2x2 matrix -->
+          <rect x="120" y="60" width="280" height="120" class="quad-active"/>
+          <rect x="400" y="60" width="280" height="120" class="quad-box"/>
+          <rect x="120" y="180" width="280" height="120" class="quad-box"/>
+          <rect x="400" y="180" width="280" height="120" class="quad-active"/>
+
+          <!-- top-left: 学術翻訳の希少化 -->
+          <text x="135" y="85" class="quad-title">学術知の翻訳 — 希少化</text>
+          <text x="135" y="105" class="quad-detail">AI 新規記事 52% → 一次解釈の希少化</text>
+          <text x="135" y="125" class="quad-detail">esse-sense / 連載「〜のかたち」</text>
+          <text x="135" y="145" class="quad-detail">の翻訳的編集の価値が逆に上がる</text>
+          <text x="135" y="165" class="quad-detail">対応事業: jigyo / kurashi / henka</text>
+
+          <!-- top-right: 累積知の信頼性 -->
+          <text x="415" y="85" class="quad-title">累積知識 — 質的優位継続</text>
+          <text x="415" y="105" class="quad-detail">人類累積 85% > AI 累積 15%</text>
+          <text x="415" y="125" class="quad-detail">学術 DB 群の信頼基盤は揺るがない</text>
+          <text x="415" y="145" class="quad-detail">引用検証 / source_url 100% の重要度上昇</text>
+          <text x="415" y="165" class="quad-detail">対応事業: academic-oracle / GC-DB</text>
+
+          <!-- bottom-left: 探究の差別化 -->
+          <text x="135" y="205" class="quad-title">探究 — AI協働で深化</text>
+          <text x="135" y="225" class="quad-detail">API 消費 1.5×10¹⁷ tokens / 年</text>
+          <text x="135" y="245" class="quad-detail">codex-team / FVCP の並列リサーチ</text>
+          <text x="135" y="265" class="quad-detail">は人類 1 人の 1,000 倍速で動く</text>
+          <text x="135" y="285" class="quad-detail">対応事業: codex-team / 補論執筆</text>
+
+          <!-- bottom-right: AI生成混入リスク -->
+          <text x="415" y="205" class="quad-title">混入リスク — 反証 DB 必須</text>
+          <text x="415" y="225" class="quad-detail">Web 新規の半分が AI = 引用元の検証必須</text>
+          <text x="415" y="245" class="quad-detail">PESTLE / CI の品質ゲート要強化</text>
+          <text x="415" y="265" class="quad-detail">human-verified flag が必須インフラ化</text>
+          <text x="415" y="285" class="quad-detail">対応事業: PESTLE / signal-db / メタ原則</text>
+        </svg>
+        <div class="caption">FIG. 補-6: 2025-2030 のテキスト生産シフトが、ミラツク 4 事業領域に与える含意。</div>
+      </div>
+
+      <h3 style="font-family:var(--font);font-size:17px;margin:32px 0 12px 0;">考察 — 動詞「共に生成する」の定着年</h3>
+      <p>2025 年を境界年とする仮説には、限定的な意味で妥当性がある。新規に Web へ公開される記事のレベルでは、Graphite が 65,000 件のサンプルで AI 比率 52% を観測し、MIT/Oxford は 2026 年に 64% と予測している。フローのレベルでは確かに「共に生成する」が主流の動詞へ移行した。しかし累積ストックのレベルでは、AI が貢献している割合は依然 15% 程度であり、人類が 5,200 年かけて蓄積した 300 兆 tokens の質保証済みテキストとの差は、当面埋まらない。</p>
+      <p>この差をどう読むかが、ミラツクの事業設計を分ける。一つの読み方は、AI 生成記事が氾濫することで一次解釈・翻訳的編集の価値が逆に高まる、という方向である。連載「〜のかたち」（暮らし / 事業 / 経営 / いとなみ / 変化）はこの読み方に立脚しており、エッセ・センスの研究者対談はその実装例となる。もう一つの読み方は、AI 協働の生産性そのものを引き上げて、人類が 1 人で扱える研究量を 1,000 倍に拡張する、という方向である。codex-team / FVCP の並列リサーチ体制はこちらにあたる。HTP-DB はこの両方の読み方を量的に裏打ちする歴史根拠層として機能する。</p>
+      <p>動詞の境界年は、ある一日に一斉に切り替わるのではない。新規フロー、累積ストック、API 消費という三層のうち、新規フローが先に超え、累積ストックが最後に超える。各層の比率推移を継続観測することで、ミラツクは「翻訳的編集」と「協働的拡張」のどちらに重きを置くかを、データに基づいて再調整できる。本補論はその観測の入口に位置づけられる。</p>
+
+      <div class="supplement-box">
+        <h4>HTP-DB Wave 4.5 修正</h4>
+        <p>本補論の調査結果を Wave 4.5 として HTP-DB に反映した。新規ソース 5 本（Epoch AI 2024 / OpenAI State of Enterprise AI 2025 / OpenRouter 2025 / Graphite 2025 / a16z 2025）追加、AI 関連レコードを「API 消費 / 新規生成 / 累積ストック」の三層に分離、`htp_source_discrepancies` に「ai_2025_api_vs_unique」「ai_vs_human_crossover_2025_2026」の 2 件を追加した。レコード数 44 → 47、ソース 18 → 23、discrepancy 3 → 5 へ更新。</p>
+      </div>
+    </section>
+
+    <footer>
+      <p>HTP-DB Wave 1-4 完走 + 2025 交差点補論 · /db-master 経由 · 2026-05-15 · 経路 B (実データDB) · db-timeseries-builder + db-text-corpus-builder + db-people-builder</p>
+      <p>赤白CI textbook.html style 準拠 · favicon: https://esse-sense.com/favicon.ico</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+function toggleTheme() {
+  const cur = document.body.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.body.setAttribute('data-theme', next);
+  document.querySelector('.theme-toggle').textContent = next === 'light' ? 'DARK' : 'LIGHT';
+  localStorage.setItem('htp-theme', next);
+}
+const saved = localStorage.getItem('htp-theme');
+if (saved) {
+  document.body.setAttribute('data-theme', saved);
+  document.querySelector('.theme-toggle').textContent = saved === 'light' ? 'DARK' : 'LIGHT';
+}
+</script>
+</body>
+</html>
