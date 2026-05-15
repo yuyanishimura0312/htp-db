@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三つの量爆発 ── 文字の誕生・印刷革命・デジタル誕生の比較検証</title>
+  <meta name="description" content="印刷革命だけが AI 時代の参照事象なのか。BC3200 の文字誕生と 1986 のデジタル誕生という別の二つの量爆発で何が陳腐化し何が希少化したかを検証し、印刷革命を最有力参照として確認する補論">
+  <link rel="icon" href="https://esse-sense.com/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFFFF; --card: #FFFFFF;
+      --accent: #121212;
+      --accent-warm: #CC1400; --accent-warm-soft: #B01200;
+      --accent-muted: rgba(204,20,0,0.06);
+      --text: #121212; --text-secondary: #555555; --text-muted: #6B6B6B;
+      --border: #D9D9D9; --border-light: #EEEEEE;
+      --highlight: #CC1400; --surface: #F7F7F5;
+      --font: "Noto Sans JP", "Hiragino Sans", -apple-system, sans-serif;
+      --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
+    }
+    [data-theme="dark"] .top-bar { border-top-color: #E0E0E0; }
+    [data-theme="dark"] {
+      --bg: #121212; --card: #1A1A1A;
+      --accent: #E0E0E0;
+      --accent-warm: #FF4030; --accent-warm-soft: #E03020;
+      --accent-muted: rgba(255,64,48,0.10);
+      --text: #E0E0E0; --text-secondary: #AAAAAA; --text-muted: #8A8A8A;
+      --border: #333333; --border-light: #2A2A2A;
+      --highlight: #FF4030; --surface: #1A1A1A;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-serif); color: var(--text); background: var(--bg); line-height: 1.95; letter-spacing: 0.025em; font-feature-settings: "palt"; min-height: 100vh; transition: background 0.2s, color 0.2s; }
+    a { color: var(--accent-warm); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .top-bar { background: var(--bg); border-top: 3px solid #121212; border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 48px; position: sticky; top: 0; z-index: 100; }
+    .top-bar-brand { font-family: var(--font); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .top-bar-brand span { color: var(--accent-warm); }
+    .top-bar-actions { display: flex; align-items: center; gap: 12px; }
+    .back-link { font-family: var(--font); font-size: 0.75rem; color: var(--text-muted); }
+    .back-link:hover { color: var(--accent-warm); }
+    .theme-toggle { background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; padding: 4px 10px; font-size: 0.72rem; font-family: var(--font); letter-spacing: 0.05em; }
+    .theme-toggle:hover { border-color: var(--accent-warm); color: var(--accent-warm); }
+
+    .book-cover { max-width: 760px; margin: 0 auto; padding: 96px 24px 72px; text-align: center; border-bottom: 1px solid var(--border); }
+    .book-cover-tag { font-family: var(--font); font-size: 0.7rem; letter-spacing: 0.18em; color: var(--accent-warm); text-transform: uppercase; margin-bottom: 24px; }
+    .book-cover-title { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 900; line-height: 1.35; letter-spacing: 0.02em; color: var(--text); margin-bottom: 16px; }
+    .book-cover-title em { font-style: normal; color: var(--accent-warm); }
+    .book-cover-subtitle { font-family: var(--font-serif); font-size: 1.05rem; color: var(--text-secondary); line-height: 1.7; margin: 24px auto 36px; max-width: 620px; }
+    .book-cover-meta { font-family: var(--font); font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.04em; }
+    .book-cover-meta span { margin: 0 8px; }
+    .book-cover-divider { width: 60px; height: 2px; background: var(--accent-warm); margin: 28px auto; }
+
+    .book-layout { display: grid; grid-template-columns: 260px 1fr; max-width: 1180px; margin: 0 auto; padding: 0 24px; gap: 0; }
+    .toc-sidebar { position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; padding: 40px 24px 40px 0; border-right: 1px solid var(--border-light); }
+    .toc-title { font-family: var(--font); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-warm); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .toc-part { font-family: var(--font); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin: 24px 0 8px; padding-top: 16px; border-top: 1px dashed var(--border-light); }
+    .toc-part:first-child { padding-top: 0; border-top: none; }
+    .toc-list { list-style: none; }
+    .toc-list li { margin: 6px 0; }
+    .toc-list a { display: block; color: var(--text-secondary); font-size: 0.78rem; line-height: 1.5; padding: 4px 8px; border-left: 2px solid transparent; transition: all 0.15s; }
+    .toc-list a:hover { color: var(--accent-warm); border-left-color: var(--accent-warm); background: var(--accent-muted); text-decoration: none; }
+    .toc-list .toc-num { display: inline-block; min-width: 32px; font-family: var(--font); font-size: 0.7rem; color: var(--text-muted); }
+
+    .book-main { padding: 60px 0 80px 60px; max-width: 760px; }
+    .chapter-section { margin-bottom: 80px; padding-bottom: 64px; border-bottom: 1px solid var(--border); }
+    .chapter-section:last-child { border-bottom: none; }
+    .chapter-number-label { font-family: var(--font); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; color: var(--accent-warm); text-transform: uppercase; margin-bottom: 12px; }
+    .chapter-title { font-family: var(--font-serif); font-size: 1.85rem; font-weight: 700; line-height: 1.45; letter-spacing: 0.015em; color: var(--text); margin-bottom: 36px; }
+    .article-h2 { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; line-height: 1.5; letter-spacing: 0.01em; color: var(--text); margin: 56px 0 22px; padding-top: 24px; border-top: 2px solid var(--accent-warm); }
+    .article-h3 { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 700; line-height: 1.5; color: var(--text); margin: 36px 0 14px; padding-left: 14px; border-left: 3px solid var(--accent-warm); }
+
+    .book-main p { font-family: var(--font-serif); font-size: 1rem; line-height: 1.95; letter-spacing: 0.025em; color: var(--text); margin-bottom: 1.4em; text-indent: 1em; }
+    .book-main p:first-of-type, .book-main h2 + p, .book-main h3 + p, .book-main .article-h2 + p, .book-main .article-h3 + p, .book-main .epigraph + p, .book-main .finding-box + p, .book-main figure + p { text-indent: 0; }
+    .book-main p strong { font-weight: 700; color: var(--accent-warm); }
+    .book-main ul { margin: 0 0 1.4em 24px; font-family: var(--font-serif); font-size: 0.95rem; line-height: 1.95; }
+    .book-main li { margin-bottom: 4px; }
+
+    .epigraph { font-family: var(--font-serif); font-style: italic; color: var(--text-secondary); border-left: 3px solid var(--accent-warm); padding: 18px 24px; margin: 28px 0 36px; background: var(--accent-muted); }
+    .epigraph p { font-family: var(--font-serif); margin-bottom: 8px; line-height: 1.85; text-indent: 0; }
+    .epigraph .attribution { font-family: var(--font); font-size: 0.8rem; font-style: normal; color: var(--text-muted); letter-spacing: 0.05em; }
+
+    .pullquote { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; color: var(--accent-warm); border-left: 4px solid var(--accent-warm); padding: 16px 24px; margin: 32px 0; background: var(--accent-muted); line-height: 1.75; text-indent: 0; }
+
+    .table-clean { width: 100%; border-collapse: collapse; margin: 24px 0; font-family: var(--font); font-size: 0.86rem; }
+    .table-clean th { background: var(--surface); padding: 12px; text-align: left; border-bottom: 2px solid var(--accent-warm); font-weight: 700; }
+    .table-clean td { padding: 10px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+    .table-clean td.year { font-family: "Fira Code", monospace; color: var(--accent-warm); white-space: nowrap; }
+    .table-clean td.num { font-family: "Fira Code", monospace; text-align: right; color: var(--accent-warm); }
+    .table-clean td.tag { font-family: "Fira Code", monospace; font-size: 0.8rem; color: var(--text-secondary); }
+
+    .finding-box { background: var(--surface); border-left: 4px solid var(--accent-warm); padding: 20px 24px; margin: 28px 0; font-family: var(--font-serif); }
+    .finding-box p { text-indent: 0; }
+    .finding-box h4 { font-family: var(--font); font-size: 0.78rem; color: var(--accent-warm); margin-bottom: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+
+    figure { margin: 36px 0; padding: 20px; background: rgba(204,20,0,0.02); border-top: 1px solid #CC1400; border-bottom: 1px solid #CC1400; }
+    figcaption { font-family: var(--font); font-size: 0.78rem; color: var(--text-muted); margin-top: 12px; text-align: center; letter-spacing: 0.04em; line-height: 1.6; }
+    .fig-no { font-family: var(--font); font-size: 0.7rem; color: var(--accent-warm); letter-spacing: 0.15em; margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
+
+    [data-theme="dark"] svg text { fill: #F0F0F0 !important; }
+    [data-theme="dark"] svg text[fill="#CC1400"] { fill: #FF5A4A !important; }
+    [data-theme="dark"] svg text[fill="#121212"] { fill: #F0F0F0 !important; }
+    [data-theme="dark"] svg text[fill="#555555"], [data-theme="dark"] svg text[fill="#555"] { fill: #CCCCCC !important; }
+    [data-theme="dark"] svg rect[fill="#FFFFFF"], [data-theme="dark"] svg rect[fill="#FFF"], [data-theme="dark"] svg rect[fill="white"] { fill: #333333 !important; }
+    [data-theme="dark"] svg line[stroke="#555555"] { stroke: #CCCCCC !important; }
+    [data-theme="dark"] svg line[stroke="#EEEEEE"] { stroke: #2A2A2A !important; }
+    [data-theme="dark"] svg line[stroke="#CC1400"] { stroke: #FF5A4A !important; }
+    [data-theme="dark"] svg circle[fill="#CC1400"] { fill: #FF5A4A !important; }
+    [data-theme="dark"] svg path[stroke="#CC1400"] { stroke: #FF5A4A !important; }
+    [data-theme="dark"] figure { background: rgba(255,90,74,0.06) !important; border-top-color: #FF5A4A !important; border-bottom-color: #FF5A4A !important; }
+    [data-theme="dark"] figcaption { color: #AAAAAA !important; }
+
+    .doc-footer { max-width: 760px; margin: 0 auto; padding: 48px 24px 96px; border-top: 1px solid var(--border); font-family: var(--font); font-size: 0.78rem; color: var(--text-muted); line-height: 1.9; }
+    .doc-footer p { margin-bottom: 8px; }
+    .doc-footer a { color: var(--accent-warm); }
+
+    @media print { .top-bar, .toc-sidebar, .theme-toggle { display: none; } .book-layout { grid-template-columns: 1fr; } .book-main { padding: 0; max-width: none; } .chapter-section { page-break-inside: avoid; } }
+    @media (max-width: 1000px) {
+      .book-layout { grid-template-columns: 1fr; }
+      .toc-sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 24px 0; }
+      .book-main { padding: 40px 0; }
+      .book-cover-title { font-size: 1.8rem; }
+      .book-cover { padding: 56px 20px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="top-bar-brand">HTP-DB <span>HUMAN TEXT PRODUCTION</span></a>
+    <div class="top-bar-actions">
+      <a href="index.html" class="back-link">← DASHBOARD</a>
+      <a href="scarcity.html" class="back-link">SCARCITY</a>
+      <a href="report.html" class="back-link">REPORT</a>
+      <button class="theme-toggle" onclick="toggleTheme()">DARK / LIGHT</button>
+    </div>
+  </div>
+
+  <section class="book-cover">
+    <div class="book-cover-tag">SUPPLEMENT II · CROSS-EVENT VERIFICATION · 2026.05</div>
+    <h1 class="book-cover-title">三つの量爆発 <em>—</em><br>文字誕生・印刷革命・デジタル誕生</h1>
+    <p class="book-cover-subtitle">印刷革命だけが AI 時代の参照事象なのか。BC3200 の文字誕生と 1986 のデジタル誕生という別の二つの量爆発で何が起きたかを検証し、印刷革命を最有力参照として確認する</p>
+    <div class="book-cover-divider"></div>
+    <div class="book-cover-meta"><span>9 章構成</span><span>·</span><span>SVG 図解 3 点</span><span>·</span><span>約 18K 字</span><span>·</span><span>scarcity.html 補完</span></div>
+  </section>
+
+<div class="book-layout">
+<aside class="toc-sidebar">
+<div class="toc-title">目次</div>
+<div class="toc-part">序</div>
+<ul class="toc-list">
+<li><a href="#preface"><span class="toc-num">序</span>三つの量爆発という見立て</a></li>
+</ul>
+<div class="toc-part">第I部 ── 文字の誕生 (BC3200)</div>
+<ul class="toc-list">
+<li><a href="#writing-event"><span class="toc-num">01</span>シュメール粘土板の量的把握</a></li>
+<li><a href="#writing-commodity"><span class="toc-num">02</span>文字誕生で陳腐化したもの</a></li>
+<li><a href="#writing-scarce"><span class="toc-num">03</span>文字誕生で希少化したもの</a></li>
+</ul>
+<div class="toc-part">第II部 ── デジタルの誕生 (1986)</div>
+<ul class="toc-list">
+<li><a href="#digital-event"><span class="toc-num">04</span>Hilbert-Lopez 1986 閾値</a></li>
+<li><a href="#digital-commodity"><span class="toc-num">05</span>デジタル誕生で陳腐化したもの</a></li>
+<li><a href="#digital-scarce"><span class="toc-num">06</span>デジタル誕生で希少化したもの</a></li>
+</ul>
+<div class="toc-part">第III部 ── 比較と結論</div>
+<ul class="toc-list">
+<li><a href="#comparison"><span class="toc-num">07</span>三事象の比較マトリクス</a></li>
+<li><a href="#why-print"><span class="toc-num">08</span>なぜ印刷革命が最有力参照か</a></li>
+<li><a href="#hybrid"><span class="toc-num">09</span>AI 時代は三事象の合成</a></li>
+</ul>
+</aside>
+
+<main class="book-main">
+
+<section id="preface" class="chapter-section">
+<div class="chapter-number-label">PROLOGUE</div>
+<h1 class="chapter-title">三つの量爆発という見立て</h1>
+
+<div class="epigraph">
+<p>書かれた言葉は、絵画の絵姿のように立っているだけで、何かを尋ねても黙ったままである。書かれた言葉はそれを理解する者にも理解できない者にも同じように届く。</p>
+<p class="attribution">— プラトン『パイドロス』275d、ソクラテスのタモス王エピソードから（紀元前 4 世紀）</p>
+</div>
+
+<p>本補論は、姉妹補論『希少になる情報、共生するテキスト生成』(<a href="scarcity.html">scarcity.html</a>) の検証作業である。前補論では、印刷革命 (1454-1800) の量爆発と AI 時代 (2022-) の量爆発を対比し、何が陳腐化し何が希少化したかを 10 対応で示した。だがそこには一つの限界があった。<strong>類推が一つだけ</strong>では、その類推が偶然なのか必然なのかが分からない。</p>
+
+<p>そこで本補論は、量爆発の事例を二つ追加で検証する。第一に <strong>BC3200 年頃のシュメールでの文字誕生</strong> ── 音声情報から書記情報への量爆発。第二に <strong>1986 年のデジタル情報量閾値超え</strong> ── アナログ情報からデジタル情報への量爆発。この二事象を分析することで、印刷革命の希少化パターンが法則性を持つのか、それとも印刷革命固有の現象なのかを判別する。</p>
+
+<p>結論を先に述べる。三つの量爆発はすべて、HTP-DB の希少化命題「情報量が爆発するとき、希少化するのは情報そのものではなく、情報を選び・編み・保証する仕事である」を確認する。同じ位相の希少化が、5,200 年を隔てて三度繰り返されている。だが、印刷革命が AI 時代の最有力参照である理由も同時に確認される。文字誕生は中央集権制（神権・王権）と直結し、デジタル誕生は商業プラットフォームと直結したが、印刷革命だけが <strong>市民社会の編集機能</strong> を生んだ唯一の事例なのである。</p>
+
+<div class="pullquote">同じ位相の希少化が、5,200 年を隔てて三度繰り返されている。<br>だが、市民社会の編集機能を生んだのは印刷革命だけだった</div>
+
+</section>
+
+<section id="writing-event" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 01</div>
+<h1 class="chapter-title">シュメール粘土板の量的把握</h1>
+
+<p>文字の誕生は、HTP-DB の起点である。SI-Framework <code>SI_AK_0001</code> が記録するように、BC3300 年頃のメソポタミアで「シュメールの記録粘土板」として、行政・取引・神殿経営の必要から楔形文字が出現した。CDLI（Cuneiform Digital Library Initiative）には現在 23 万点の楔形テキストがカタログ化されており、推定総数は 50 万点を超える。</p>
+
+<h2 class="article-h2">量爆発の構造 ── BC3200 から BC2000 へ</h2>
+
+<p>文字発明前夜の人類は、すべての情報を音声と記憶に依存していた。具体的に量を比較する。一人の人間が記憶できる情報量は、認知科学の推計で 100-1,000 MB 相当（生涯記憶を音声テキスト換算）。これに対し BC3200-2000 の 1,200 年間で生産された楔形文字テキストは、CDLI 推計で約 10 万点。一点あたり平均 200 文字とすると、累積 20 M 文字 = 約 100 MB 相当である。</p>
+
+<p>つまり量だけ見れば、文字発明後 1,200 年経っても、文字情報の累積総量は一人の人間の記憶量と同等にすぎなかった。HTP-DB の <code>cuneiform_sumerian</code> レコードが「100,000 tablets」を <code>gta_status='estimated'</code> で記録するのはこの規模である。これは印刷革命の incunabula 期 (1454-1500) の 1,250 万部とは三桁違いの規模感である。</p>
+
+<p>しかし文字の量爆発の本質は、累積総量ではなく <strong>外部化された情報</strong> という新しい資源カテゴリの出現にあった。一人の脳に閉じていた情報が、粘土板という物質に転写可能になった瞬間、情報は世代を超えて累積する性質を獲得した。これは「総量」ではなく「持続性」の量爆発である。</p>
+
+<h2 class="article-h2">五つの並行発明</h2>
+
+<p>SI-Framework が記録する文字誕生は、メソポタミアだけではない。世界各地で並行発明が起きている。</p>
+
+<table class="table-clean">
+<thead><tr><th>年代</th><th>事象 / 地域</th><th>SI Framework ID</th></tr></thead>
+<tbody>
+<tr><td class="year">BC3300</td><td>シュメール楔形文字（メソポタミア）</td><td><code>SI_AK_0001</code></td></tr>
+<tr><td class="year">BC3100</td><td>エジプト象形文字（HTP-DB <code>egyptian_old_kingdom</code>）</td><td>—</td></tr>
+<tr><td class="year">BC2500</td><td>インカ・キープ記録（並行発明、結縄）</td><td><code>SI_AM_2526</code> / <code>SI_AM_2951</code></td></tr>
+<tr><td class="year">BC1200</td><td>漢字（殷代甲骨文字）</td><td>—</td></tr>
+<tr><td class="year">BC1050</td><td>フェニキア・アルファベット</td><td><code>SI_XX_2400</code></td></tr>
+</tbody>
+</table>
+
+<p>注目すべきは、アンデスのインカ・キープ（結縄記録）が SI-Framework で <code>knowledge_democracy</code> タイプとして記録されていることである。これは「文字」と呼ぶか否かが論争的だが、情報の外部化という機能は同じである。文字の量爆発は人類の各地で独立に発明されており、その意味で印刷革命より <strong>普遍性が高い</strong> 量爆発であった。</p>
+
+</section>
+
+<section id="writing-commodity" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 02</div>
+<h1 class="chapter-title">文字誕生で陳腐化したもの</h1>
+
+<p>文字が出現する以前の社会は、口承文化が情報伝達の主要な様式であった。文字の登場により、何が陳腐化したか。プラトンの『パイドロス』(BC4 世紀)、Walter Ong『声の文化と文字の文化』(1982)、Eric Havelock『プラトン序説』(1963) の古典的研究を、SI-Framework のデータと照合する。</p>
+
+<h2 class="article-h2">陳腐化一 ── 純粋な暗誦能力</h2>
+
+<p>ホメロスの『イーリアス』『オデュッセイア』は、BC8 世紀頃にギリシアで口承から文字テキスト化された。それ以前のギリシアでは、職業吟唱詩人 (rhapsodist) が 24 巻 15,000 行を全て暗記して朗詠していた。文字化以後、この能力は急速に陳腐化する。プラトンの時代 (BC4 世紀) までに、純粋な暗誦能力は専門職としては成立しなくなった。Havelock の中心命題は、ギリシア哲学の抽象思考が可能になったのは、暗誦に脳の容量を割く必要がなくなったからだ、というものである。</p>
+
+<h2 class="article-h2">陳腐化二 ── 口承の流動性</h2>
+
+<p>口承の本質は、語り手と聴き手の場でその都度変容する点にある。同じ物語が、語り手・地域・季節・聴衆ごとに違う形で生まれ続けた。文字化はこの流動性を凍結する。Walter Ong は『声の文化と文字の文化』で、書字された言葉は「死んだもの」として固定され、その代わりに「正確な比較」が可能になると指摘した。これは Eisenstein の Fixity 命題を、文字誕生まで遡らせた視点である。</p>
+
+<h2 class="article-h2">陳腐化三 ── 部族長老の独占的権威</h2>
+
+<p>文字がない社会では、過去の判例・契約・神話を記憶する長老が、知識権威の中心にいた。誰が何を覚えているかが、共同体の決定力に直結した。BC3300 年以降のシュメールでは、楔形文字粘土板が契約・判例を物質として保存することで、長老の記憶独占が陳腐化した。今や粘土板を読める書記階級（dub-sar）が、新しい権威となる。</p>
+
+<h2 class="article-h2">陳腐化四 ── 場と共にある言葉</h2>
+
+<p>口承文化では、言葉は語られる場（祭儀・集会・葬礼）と分離できなかった。文字化により、テキストは場から切り離されて運搬可能になる。これは情報の「context」を失うことでもある。プラトンの『パイドロス』275d でソクラテスがエジプト王タモスを引用しつつ批判するのは、まさにこの脱文脈化への警戒であった。「書かれた言葉はそれを理解する者にも理解できない者にも同じように届く」── 文字は読み手を選ばない暴力性を持つ、というのがソクラテスの懸念であった。</p>
+
+<h2 class="article-h2">陳腐化五 ── 共同体の同時性</h2>
+
+<p>口承の場では、語り手と聴き手は同じ時間・同じ空間にいる必要があった。文字化はこの同時性を解除する。BC668 のアッシュールバニパル王立図書館 (<code>SI_P4F_0002</code>) は、王が死んで数世紀後の読者にも同じテキストを提供する装置として機能した。共同体の単位は「同時にいる人々」から「同じ文字を読める人々」へと拡張される（あるいは縮小される）。これは Benedict Anderson の「想像の共同体」概念を 5,000 年遡らせた構造である。</p>
+
+</section>
+
+<section id="writing-scarce" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 03</div>
+<h1 class="chapter-title">文字誕生で希少化したもの</h1>
+
+<p>陳腐化と並行して、文字誕生は新しい希少資源を生んだ。印刷革命の希少化 10 項目と比較できる形で整理する。</p>
+
+<table class="table-clean">
+<thead><tr><th>#</th><th>希少化したもの</th><th>制度化された装置</th><th>SI Framework</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>書記の能力</td><td>シュメール書記学校 (E-dubba)、エジプト書記階級</td><td>—</td></tr>
+<tr><td>2</td><td>テキスト保存の場</td><td>アッシュールバニパル王立図書館 (BC668)</td><td><code>SI_P4F_0002</code></td></tr>
+<tr><td>3</td><td>テキスト集積センター</td><td>プトレマイオス朝アレクサンドリア図書館 (BC283)</td><td><code>SI_P4F_0004</code></td></tr>
+<tr><td>4</td><td>文字の統一規格</td><td>秦始皇帝の度量衡・文字統一 (BC221)</td><td><code>SI_EA_2510</code></td></tr>
+<tr><td>5</td><td>口承の二次的価値化</td><td>古典化されたホメロス、ヴェーダ文献</td><td>—</td></tr>
+<tr><td>6</td><td>テキスト解釈の専門性</td><td>祭司階級、注釈学派 (ユダヤ教ミシュナ等)</td><td>—</td></tr>
+<tr><td>7</td><td>口頭での即興と機知</td><td>ソフィスト、修辞学校、ローマ法廷弁論</td><td>—</td></tr>
+<tr><td>8</td><td>身体的伝承の権威</td><td>師弟関係、徒弟制、口伝の名人芸</td><td>—</td></tr>
+<tr><td>9</td><td>記憶術そのもの (失われた技術)</td><td>古代ローマの記憶宮殿術、中世スコラ記憶術</td><td>—</td></tr>
+<tr><td>10</td><td>文字以前の世界観</td><td>神話的時間、循環的歴史観</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h2 class="article-h2">中央集権との結合</h2>
+
+<p>文字誕生の希少化と印刷革命の希少化には、決定的な違いがある。文字誕生の希少化はほぼ全て <strong>中央集権制（神権・王権・帝国）</strong> と結合して制度化された。シュメール書記学校は王宮と神殿の付属機関であり、アッシュールバニパル図書館は新アッシリア帝国の威信プロジェクトであった。アレクサンドリア図書館はプトレマイオス朝の中央集権的科学事業であり、秦の文字統一は始皇帝の国家統合策であった。</p>
+
+<p>これは印刷革命と大きく異なる。印刷期の希少化は Aldine Press のような商業ベンチャー、Royal Society のような市民学会、Statute of Anne のような議会立法と結合した。「市民社会による希少資源の囲い込み」が初めて起きたのは印刷革命であり、それ以前の文字誕生では希少化は常に国家権力と一体だった。</p>
+
+<div class="finding-box">
+<h4>プラトンの予言と長期視点</h4>
+<p>プラトン『パイドロス』のソクラテス批判 (BC4 世紀) は、文字化が記憶能力を退化させることを警戒した。これは紀元前から続く「新メディアによる退化論」の最初の例である。同じ批判は、印刷期にも (Conrad Gessner 1545 の情報過多警告)、電話発明期にも、テレビ普及期にも、SNS 時代にも、AI 時代にも繰り返される。プラトンの懸念は技術論ではなく、能力の希少化が起きるたびに繰り返される構造的反応だったのである。</p>
+</div>
+
+</section>
+
+<section id="digital-event" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 04</div>
+<h1 class="chapter-title">Hilbert-Lopez 1986 閾値</h1>
+
+<p>HTP-DB の <code>1986</code> レコードは、Hilbert & López (2011) の Science 論文を出典として「全世界の蓄積情報量がデジタル媒体で 2.6 EB に達した」と記録する。これがデジタル誕生の量的閾値である。それまでアナログ媒体 (印刷・テープ・フィルム) が情報総量の大半を占めていたが、1986 年に初めてデジタル媒体の累積が一定規模に達した。</p>
+
+<h2 class="article-h2">三段階の加速</h2>
+
+<table class="table-clean">
+<thead><tr><th>年</th><th>蓄積情報量</th><th>HTP-DB period_id</th></tr></thead>
+<tbody>
+<tr><td class="year">1986</td><td class="num">2.6 EB</td><td>1986</td></tr>
+<tr><td class="year">2007</td><td class="num">295 EB</td><td>Hilbert-Lopez baseline</td></tr>
+<tr><td class="year">2010</td><td class="num">1.2 ZB</td><td>2010</td></tr>
+<tr><td class="year">2015</td><td class="num">15.5 ZB</td><td>2015</td></tr>
+<tr><td class="year">2020</td><td class="num">64.2 ZB</td><td>2020</td></tr>
+<tr><td class="year">2023</td><td class="num">120 ZB</td><td>2023</td></tr>
+</tbody>
+</table>
+
+<p>40 年で 5 万倍。これは印刷革命の世紀ごとの倍率（17 倍、2.5 倍、1.8 倍）よりも 1 桁高速である。しかし注意すべきは、デジタル情報量の大半は動画・音声・センサーデータであり、テキストは数% にすぎないという点である。HTP-DB の補論「情報生産の 2030-2100」のための量推定では、デジタル時代のテキスト量と総データ量を <code>htp_unified_volume.note</code> で区別している。</p>
+
+<h2 class="article-h2">三つの転換点</h2>
+
+<p>SI-Framework の記録によると、デジタル誕生の量爆発には三つの転換点がある。第一に <strong>1989 年 WWW 公開</strong> (<code>SI_DR_0044</code>)。CERN の Tim Berners-Lee が World Wide Web を公共財として公開したことで、デジタル情報の流通インフラが整った。これは「知識民主化 (knowledge_democracy)」イベントとして SI-Framework に記録されている。</p>
+
+<p>第二に <strong>1998 年 Google 創業</strong> (<code>SI_AK_0489</code>)。検索が量爆発に対応する第一の応答装置として登場した。情報を「すべて持つ」ことは不可能だが「すべて検索できる」ことが可能になった。これは図書館の代替ではなく、図書館の役割を再定義する装置であった。</p>
+
+<p>第三に <strong>2001 年 Wikipedia 創立</strong> (<code>SI_XX_2096</code>)。中央権威に依存しない協働編集型の百科事典が成立した。これは Encyclopédie (1751) の系譜にあるが、編集権が市民に分散されている点で構造的に異なる。SI-Framework は Wikipedia を <code>knowledge_democracy</code> タイプで複数回記録している (<code>SI_EA_0133</code> / <code>SI_XX_2297</code>)。</p>
+
+</section>
+
+<section id="digital-commodity" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 05</div>
+<h1 class="chapter-title">デジタル誕生で陳腐化したもの</h1>
+
+<p>1986-2010 年の間に、何が陳腐化したか。多くは印刷期の希少化資源が、わずか 24 年で逆に陳腐化する展開を辿った。</p>
+
+<h2 class="article-h2">陳腐化一 ── 物理的アクセスの制約</h2>
+
+<p>1980 年代まで、情報を得るためには物理的に書店・図書館に出向く必要があった。読みたい本があれば取り寄せに数週間かかり、絶版本は学術図書館でしか読めなかった。WWW 公開 (1989) と検索エンジン (1998) は、この物理的アクセスの制約を急速に陳腐化させた。「行かないと得られない情報」がほぼ消滅した。</p>
+
+<h2 class="article-h2">陳腐化二 ── 印刷百科事典</h2>
+
+<p>1768 年創刊の Encyclopædia Britannica は、世界で最も権威ある印刷百科事典として 244 年間続いたが、2012 年に印刷版の終了を発表した。同じく日本の『日本大百科全書』『世界大百科事典』も印刷版から電子版へ完全移行した。Wikipedia (2001) の登場から 11 年で、印刷百科事典という形態は商業的に成立しなくなった。</p>
+
+<h2 class="article-h2">陳腐化三 ── 編集ゲートキーパー</h2>
+
+<p>印刷期の希少資源だった「編集判断」(Aldine Press 1495 から続く伝統) が、デジタル期には逆に部分的に陳腐化した。誰でも Web に発信できる状況では、編集者を経由しない直接出版が可能になり、出版社・新聞社の編集機能の独占が解体された。これは Luther が母語訳聖書で教会の聖書解釈独占を解体したのと構造的に似ているが、規模は遥かに広い。</p>
+
+<h2 class="article-h2">陳腐化四 ── 注意の安価さ</h2>
+
+<p>情報量が指数的に増えた結果、一情報あたりの読者の注意は希少資源化した。これは陳腐化ではなく、その逆だが、ここでは「注意の安価な無限供給」という暗黙の前提が陳腐化したと整理する。Herbert Simon が 1971 年に「情報の豊富さは注意の貧困を生む」と予言したとおり、2000 年代以降、注意経済 (attention economy) がデジタル広告産業の中核理論となった。</p>
+
+<h2 class="article-h2">陳腐化五 ── 固定された出版形態</h2>
+
+<p>印刷期の Eisenstein Fixity 命題は、デジタル期には部分的に陳腐化する。電子書籍は購入後にもアップデートされ、Web 記事は公開後に書き換えられる。同じ URL でも数年後には異なる内容が表示される。Internet Archive (1996 創設、<code>SI_P4E_0060</code>) はこの Fixity の喪失を補うために登場した装置である。</p>
+
+</section>
+
+<section id="digital-scarce" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 06</div>
+<h1 class="chapter-title">デジタル誕生で希少化したもの</h1>
+
+<p>デジタル誕生で希少化した 10 項目を、印刷期との対応で整理する。</p>
+
+<table class="table-clean">
+<thead><tr><th>#</th><th>希少化したもの</th><th>制度化装置</th><th>年代</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>検索可能性</td><td>Google (1998)、Internet Archive (1996)</td><td class="year">1996-1998</td></tr>
+<tr><td>2</td><td>注意 (attention)</td><td>注意経済論、Simon 1971</td><td class="year">1971-</td></tr>
+<tr><td>3</td><td>個人プライバシー</td><td>GDPR (2018)、Cambridge Analytica 事件 (2013-2018)</td><td class="year">2013-2018</td></tr>
+<tr><td>4</td><td>信頼できる出所</td><td>Wikipedia 出典規則、ファクトチェック組織</td><td class="year">2001-</td></tr>
+<tr><td>5</td><td>身体的・対面的経験</td><td>Sherry Turkle『Alone Together』(2011)</td><td class="year">2011-</td></tr>
+<tr><td>6</td><td>長文を読み通す集中力</td><td>Nicholas Carr『Shallows』(2010)</td><td class="year">2010-</td></tr>
+<tr><td>7</td><td>所有 (vs サブスク)</td><td>Spotify (2006)、Steam、Kindle 等の所有否定モデル</td><td class="year">2006-</td></tr>
+<tr><td>8</td><td>記録の永続性 (link rot)</td><td>Internet Archive (1996)、Memento Project</td><td class="year">1996-</td></tr>
+<tr><td>9</td><td>協働編集の品質基準</td><td>Wikipedia 編集ポリシー (NPOV / V / NOR)</td><td class="year">2001-</td></tr>
+<tr><td>10</td><td>離散的な公私の区別</td><td>GDPR / 個人情報保護法 / プラットフォーム透明性指令</td><td class="year">2018-</td></tr>
+</tbody>
+</table>
+
+<h2 class="article-h2">商業プラットフォームとの結合</h2>
+
+<p>文字誕生の希少化が「中央集権制」と結合したのに対し、デジタル誕生の希少化は「商業プラットフォーム」と結合した。Google・Meta・Amazon・Apple・Microsoft が、デジタル希少資源（検索可能性・注意・データ・所有形態）のほぼ全てを商業化した。これは印刷期の Aldine Press 型応答と表面的には似ているが、スケールと寡占の度合いが桁違いである。</p>
+
+<p>1710 年の Statute of Anne が「著者の権利」を保護したのに対し、2018 年の GDPR は「個人データの権利」を保護する。両者はいずれも、量爆発で希少化した個人領域の権利を立法化した応答だが、デジタル時代の方が応答が圧倒的に高速である（Internet 普及から GDPR まで約 25 年、印刷から Berne Convention まで 432 年）。</p>
+
+<div class="finding-box">
+<h4>デジタル誕生の三つの「市民的応答」</h4>
+<p>商業プラットフォーム独占に対する市民的応答も、デジタル誕生では同時並行で起きた。<strong>Wikipedia (2001)</strong> は協働編集型の Encyclopédie 復活。<strong>Internet Archive (1996)</strong> は記憶の市民的保管装置。<strong>Creative Commons (2001)</strong> は著作権の民主化。これら三つは、印刷期に 369 年かけて積み重ねられた応答群を、わずか 5 年で並行構築した実例である。AI 時代の応答速度予測（scarcity.html 第 11 章）の根拠の一つは、このデジタル期の高速応答パターンである。</p>
+</div>
+
+</section>
+
+<section id="comparison" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 07</div>
+<h1 class="chapter-title">三事象の比較マトリクス</h1>
+
+<p>三つの量爆発を、希少化の主要 6 軸で並べる。AI 時代の量爆発を含めると四事象になる。</p>
+
+<figure>
+<div class="fig-no">FIG. 01</div>
+<svg viewBox="0 0 760 460" width="100%" xmlns="http://www.w3.org/2000/svg" style="background:#FFFFFF;">
+<style>
+.col-h { font: 700 12px "Noto Sans JP"; fill:#CC1400; }
+.row-h { font: 700 11px "Noto Sans JP"; fill:#121212; }
+.cell { font: 11px "Noto Sans JP"; fill:#555555; }
+.event-yr { font: 600 10px "Fira Code"; fill:#CC1400; }
+.row-line { stroke:#EEEEEE; stroke-width:1; }
+.col-line { stroke:#EEEEEE; stroke-width:1; }
+</style>
+<text x="380" y="22" font-family="Noto Sans JP" font-size="13" font-weight="600" fill="#121212" text-anchor="middle">四つの量爆発の希少化マトリクス</text>
+
+<text x="20" y="60" class="col-h">希少化の軸</text>
+<text x="180" y="60" class="col-h">文字誕生</text>
+<text x="320" y="60" class="col-h">印刷革命</text>
+<text x="490" y="60" class="col-h">デジタル誕生</text>
+<text x="640" y="60" class="col-h">AI 時代</text>
+
+<text x="180" y="76" class="event-yr">BC3300</text>
+<text x="320" y="76" class="event-yr">AD1454</text>
+<text x="490" y="76" class="event-yr">AD1986</text>
+<text x="640" y="76" class="event-yr">AD2022</text>
+
+<line x1="15" y1="82" x2="745" y2="82" class="row-line"/>
+
+<text x="20" y="105" class="row-h">編集判断</text>
+<text x="180" y="105" class="cell">書記階級独占</text>
+<text x="320" y="105" class="cell">Aldine 商業化</text>
+<text x="490" y="105" class="cell">部分的解体</text>
+<text x="640" y="105" class="cell">人間に再凝縮</text>
+
+<text x="20" y="135" class="row-h">権威認証</text>
+<text x="180" y="135" class="cell">神権・王権独占</text>
+<text x="320" y="135" class="cell">Royal Society 査読</text>
+<text x="490" y="135" class="cell">Wikipedia 出典</text>
+<text x="640" y="135" class="cell">provenance hash</text>
+
+<text x="20" y="165" class="row-h">curation</text>
+<text x="180" y="165" class="cell">王立図書館</text>
+<text x="320" y="165" class="cell">Bodleian 公共化</text>
+<text x="490" y="165" class="cell">Google 検索</text>
+<text x="640" y="165" class="cell">非西洋 curation</text>
+
+<text x="20" y="195" class="row-h">親密性</text>
+<text x="180" y="195" class="cell">対面伝承</text>
+<text x="320" y="195" class="cell">書簡文化</text>
+<text x="490" y="195" class="cell">対面回帰 (Turkle)</text>
+<text x="640" y="195" class="cell">フィールドワーク</text>
+
+<text x="20" y="225" class="row-h">注意</text>
+<text x="180" y="225" class="cell">場の同時性</text>
+<text x="320" y="225" class="cell">沈黙の文学</text>
+<text x="490" y="225" class="cell">attention economy</text>
+<text x="640" y="225" class="cell">選ばない判断</text>
+
+<text x="20" y="255" class="row-h">著者性</text>
+<text x="180" y="255" class="cell">匿名・集合著作</text>
+<text x="320" y="255" class="cell">Statute of Anne</text>
+<text x="490" y="255" class="cell">CC ライセンス</text>
+<text x="640" y="255" class="cell">human-verified</text>
+
+<text x="20" y="285" class="row-h">記憶</text>
+<text x="180" y="285" class="cell">暗誦の陳腐化</text>
+<text x="320" y="285" class="cell">蔵書印 / 蔵書票</text>
+<text x="490" y="285" class="cell">Internet Archive</text>
+<text x="640" y="285" class="cell">学術 DB 群</text>
+
+<text x="20" y="315" class="row-h">プライバシー</text>
+<text x="180" y="315" class="cell">未分化</text>
+<text x="320" y="315" class="cell">書簡の私性</text>
+<text x="490" y="315" class="cell">GDPR (2018)</text>
+<text x="640" y="315" class="cell">AI 出力からの保護</text>
+
+<line x1="15" y1="330" x2="745" y2="330" class="row-line"/>
+
+<text x="20" y="355" class="row-h">主結合先</text>
+<text x="180" y="355" class="cell" fill="#CC1400" font-weight="700">中央集権</text>
+<text x="320" y="355" class="cell" fill="#CC1400" font-weight="700">市民社会</text>
+<text x="490" y="355" class="cell" fill="#CC1400" font-weight="700">商業独占</text>
+<text x="640" y="355" class="cell" fill="#CC1400" font-weight="700">三層の合成</text>
+
+<text x="20" y="380" class="row-h">応答完成期間</text>
+<text x="180" y="380" class="cell">3,000+ 年</text>
+<text x="320" y="380" class="cell">369 年</text>
+<text x="490" y="380" class="cell">25-50 年</text>
+<text x="640" y="380" class="cell">予測: 5-30 年</text>
+
+<text x="20" y="405" class="row-h">代表ソース</text>
+<text x="180" y="405" class="cell">CDLI / Havelock</text>
+<text x="320" y="405" class="cell">Buringh / Eisenstein</text>
+<text x="490" y="405" class="cell">Hilbert-Lopez / IDC</text>
+<text x="640" y="405" class="cell">Epoch AI / Graphite</text>
+
+<line x1="15" y1="430" x2="745" y2="430" class="row-line"/>
+<text x="380" y="450" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">同じ位相の希少化が三回繰り返されるが、結合先が「中央集権 → 市民社会 → 商業独占 → 三層合成」と変化する</text>
+</svg>
+<figcaption>FIG. 01 ── 四つの量爆発の希少化マトリクス。8 軸 × 4 事象。HTP-DB / SI-Framework 横断集計。</figcaption>
+</figure>
+
+<p>マトリクスから読み取れる三つの構造的パターンを整理する。第一に、希少化の軸そのものは三事象を通じて <strong>連続している</strong>。編集判断・権威認証・curation・親密性・注意・著者性・記憶・プライバシーの 8 軸は、強弱はあれどすべての量爆発で希少化している。これは、量爆発が情報そのものを陳腐化させ、情報を扱う仕事を希少化させるという普遍的法則の存在を示唆する。</p>
+
+<p>第二に、希少化が結合する <strong>制度的相手は事象ごとに変化する</strong>。文字誕生は中央集権制（神権・王権）、印刷革命は市民社会（編集ブランド・学会・議会）、デジタル誕生は商業プラットフォーム（GAFA）、と移行している。AI 時代はこの三つすべての合成として展開している可能性が高い ── 国家規制（EU AI Act）、市民応答（Wikipedia・esse-sense 型編集）、商業独占（OpenAI・Anthropic・Google）の三層が同時並行する。</p>
+
+<p>第三に、応答完成までの時間が <strong>3 桁圧縮</strong>されている。文字誕生から国際著作権体制までは 3,000 年以上、印刷革命から同体制までは 369 年、デジタル誕生から GDPR までは 25-50 年。AI 時代の応答は 5-30 年と予測される。</p>
+
+</section>
+
+<section id="why-print" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 08</div>
+<h1 class="chapter-title">なぜ印刷革命が最有力参照か</h1>
+
+<p>三事象を比較した結果として、AI 時代の参照事象として印刷革命を選ぶことの妥当性は、以下の四点で確認される。</p>
+
+<h2 class="article-h2">理由一 ── 市民社会の編集機能</h2>
+
+<p>印刷革命だけが、市民社会の中に編集機能を生んだ唯一の事例である。文字誕生は中央集権の付属物として、デジタル誕生は商業独占の利益として、希少化資源が制度化された。一方、印刷革命の Aldine Press・Royal Society・Encyclopédie・Statute of Anne は、いずれも国家でも商業独占でもない第三のセクターから生まれた。ミラツクが連載「〜のかたち」シリーズや esse-sense で実装している翻訳的編集の機能は、まさにこの市民社会型の編集系譜にある。</p>
+
+<h2 class="article-h2">理由二 ── 量と質の同時応答</h2>
+
+<p>文字誕生では、量爆発の初期には「質を保証する」という発想自体がなかった（書記の存在だけで権威）。デジタル誕生では、量爆発が先行し、質保証 (出典・peer-review・fact-check) は数十年遅れて出現した。印刷革命だけが、量爆発の最初の世紀 (16c) から既に質保証の議論を併走させた事例である。Aldine 校訂・宗教改革の論争・Index Librorum (1559)・Erasmus テキスト批評 (1516)、これらすべてが「量と質の同時応答」を実装した。</p>
+
+<h2 class="article-h2">理由三 ── Fixity と Fluidity の境界</h2>
+
+<p>scarcity.html 第 6 章で論じた Eisenstein Fixity 命題は、印刷革命がテキストに「固定性」を与えた点を強調する。文字誕生も Fixity を与えたが、写本期は誤写の累積で部分的に Fluidity であった。デジタル誕生は Fluidity (link rot / 編集可能性 / personalization) を再導入した。AI 時代は完全に Fluidity の側に振れる。</p>
+
+<p>つまり Fixity → Fluidity の認識論的移行に関しては、印刷期と AI 時代が <strong>正反対の極</strong> に立つ。この対比こそが、AI 時代の希少化を考えるとき、印刷期との対比が最も鋭い情報を与える理由である。文字誕生やデジタル誕生は、この極端な対比を提供しない。</p>
+
+<h2 class="article-h2">理由四 ── データの密度</h2>
+
+<p>HTP-DB の検証可能性から見ても、印刷期は最もデータ密度が高い参照事象である。Buringh & van Zanden (2009) と Buringh (2011) によって、写本期と印刷期の量推定が世紀単位で体系化されている。SI-Framework に記録される印刷革命関連事象は 20 件以上、知識民主化タイプの事象は 30 件以上ある。文字誕生は CDLI が部分的にカバーするが、社会変化の文脈は古典学・文献学の専門知識に依存する。デジタル誕生は HTP-DB に明確な数値があるが、まだ 40 年の時間距離しかない。</p>
+
+<div class="pullquote">印刷革命だけが、市民社会型の応答・量と質の同時実装・<br>Fixity 極・高密度データを兼ね備えた唯一の参照事象である</div>
+
+</section>
+
+<section id="hybrid" class="chapter-section">
+<div class="chapter-number-label">CHAPTER 09</div>
+<h1 class="chapter-title">AI 時代は三事象の合成</h1>
+
+<p>しかし、印刷革命を最有力参照と確認したうえで、AI 時代の量爆発が三事象の合成であることも認める必要がある。文字誕生とデジタル誕生からも、それぞれ独自の含意が AI 時代に持ち越される。</p>
+
+<h2 class="article-h2">文字誕生から持ち越されるもの</h2>
+
+<p>文字誕生から AI 時代に持ち越される最も重要な視点は、<strong>能力の退化論</strong> と <strong>中央集権の誘惑</strong> の二点である。プラトンの『パイドロス』批判 (BC4 世紀) が記憶能力の退化を警戒したのと同じ構造で、AI 時代には「自分で考える能力」「文章を書く能力」「情報を選別する能力」の退化が警戒されている。Nicholas Carr の『Shallows』(2010) はデジタル誕生で同じ批判を繰り返し、AI 時代にはより激しい議論が起きている。</p>
+
+<p>もう一点、文字誕生の希少化が中央集権制と結合したことは、AI 時代の警告として読み直せる。AI 訓練データ・モデル重み・推論インフラを少数の主体（米中 5-6 社）が独占している現状は、シュメール書記学校が王宮付属だった構造に近い。EU AI Act・Anthropic 和解 (2025)・Chinese AI 規制等は、この中央集権化への市民社会的対抗である。</p>
+
+<h2 class="article-h2">デジタル誕生から持ち越されるもの</h2>
+
+<p>デジタル誕生から AI 時代に持ち越される最も重要な視点は、<strong>商業プラットフォーム独占の継続</strong> と <strong>応答速度の指数加速</strong> である。GAFA がデジタル希少資源を商業化したのと同じ構造で、OpenAI・Anthropic・Google・Meta・Microsoft が AI 希少資源を商業化している。HTP-DB の <code>htp_unified_volume.ai_api_consumption_2025</code> レコードが示す 1.5×10¹⁷ tokens の API 消費は、ほぼ全てが商業 API 経由である。</p>
+
+<p>応答速度については、デジタル誕生から GDPR まで 25-50 年、ChatGPT から最初の主要訴訟 (NYT) までは 1 年。AI 時代の応答が、デジタル誕生よりさらに 1 桁速いことが既に確認できている。これは scarcity.html 第 11 章のタイムライン予測に直接反映されている。</p>
+
+<h2 class="article-h2">三事象合成としての AI 時代</h2>
+
+<p>結論として、AI 時代の量爆発は、文字誕生・印刷革命・デジタル誕生の <strong>三事象合成</strong> として展開している。中央集権制との結合（米中の AI 国家戦略）、市民社会の編集応答（Wikipedia / esse-sense / オープンソース LLM）、商業独占の継続（OpenAI / Anthropic / Google）の三層が同時並行する。</p>
+
+<p>この三層合成という見方は、scarcity.html の「四つの共生様式」（翻訳的編集型 / 査読・認証型 / 組織化・百科型 / 帰属・所有型）を補完する。様式 A (Aldine 型) は市民社会層に対応し、様式 B (Royal Society 型) は中央集権 ↔ 市民社会の境界に位置し、様式 C (Encyclopédie 型) はデジタル誕生から継承した協働編集を発展させ、様式 D (Statute of Anne 型) は文字誕生以来の著者性の問題系を AI 時代へ持ち越す。</p>
+
+<div class="finding-box">
+<h4>HTP-DB の自己位置</h4>
+<p>HTP-DB 自身は、この三事象合成のどこに位置するか。本データベースの設計原則（path-1 真実層・v2 失敗継承・件数禁止 KPI）は、明確に <strong>市民社会型の応答</strong> である。国家規制でも商業独占でもなく、第三セクターの NPO 法人ミラツクが、AI と協働で 2 FDD で構築した。これは Aldine Press (1495) の現代版であり、印刷革命の系譜にある。同時に、内部で扱うデータは三事象全てを横断する。本補論はその位置取りを明示する記録である。</p>
+</div>
+
+<h2 class="article-h2">結語 ── 三度繰り返される位相</h2>
+
+<p>本補論の検証は、scarcity.html の中心命題を強化する。情報量が爆発するとき、希少化するのは情報そのものではなく、情報を選び・編み・保証する仕事である ── この命題は、文字誕生・印刷革命・デジタル誕生の三事象すべてで確認された。三度繰り返される位相は、偶然ではなく構造的法則である。</p>
+
+<p>同時に、希少化が結合する制度的相手は事象ごとに変化することも確認された。AI 時代は中央集権・市民社会・商業独占の三層合成として展開し、ミラツクの仕事は明確に市民社会層に位置する。印刷革命を最有力参照とすることの意味は、私たちが立脚すべき層がそこにあるからである。Aldine Press が当時のベネチアで「正確な校訂とハンディな八つ折り判」を商業化したのと同じく、今日のミラツクは「人間編集を経た翻訳的解釈」を esse-sense と連載「〜のかたち」で商業化している。これは 530 年を隔てた、同じ位相の応答である。</p>
+
+</section>
+
+</main>
+</div>
+
+<footer class="doc-footer">
+<p><strong>三つの量爆発 ── HTP-DB レポート補論 II</strong></p>
+<p>著者: 西村勇也（NPO法人ミラツク）+ Claude Opus 4.7（1M context）</p>
+<p>作成: 2026-05-16 / 姉妹補論 <a href="scarcity.html">scarcity.html</a> の検証拡張</p>
+<p>参照 DB: HTP-DB / SI-Framework / Buringh 2009 + 2011 / Eisenstein 1979 / Havelock 1963 / Ong 1982 / Hilbert-Lopez 2011 / Plato Phaedrus</p>
+<p><a href="index.html">DASHBOARD</a> · <a href="report.html">REPORT</a> · <a href="scarcity.html">SCARCITY</a> · <a href="https://github.com/yuyanishimura0312/htp-db" target="_blank">GITHUB</a></p>
+</footer>
+
+<script>
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('htp-theme', next);
+}
+const saved = localStorage.getItem('htp-theme');
+if (saved) {
+  document.documentElement.setAttribute('data-theme', saved);
+}
+</script>
+</body>
+</html>
