@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>HTP-DB — 人類が生成した文字・テキストの量</title>
+<link rel="icon" href="https://esse-sense.com/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&family=Fira+Code&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFFFFF;
+  --card: #FFFFFF;
+  --card-hover: #F7F7F5;
+  --accent: #121212;
+  --accent-soft: #555555;
+  --accent-warm: #CC1400;
+  --accent-warm-soft: #B01200;
+  --accent-muted: rgba(204,20,0,0.06);
+  --text: #121212;
+  --text-secondary: #555555;
+  --text-muted: #6B6B6B;
+  --border: #D9D9D9;
+  --border-light: #EEEEEE;
+  --highlight: #CC1400;
+  --surface: #F7F7F5;
+  --font: "Noto Sans JP", "Hiragino Sans", -apple-system, sans-serif;
+  --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
+  --font-mono: "Fira Code", "SF Mono", monospace;
+}
+[data-theme="dark"] {
+  --bg: #121212;
+  --card: #1A1A1A;
+  --card-hover: #222222;
+  --accent: #E0E0E0;
+  --accent-warm: #FF4030;
+  --accent-muted: rgba(255,64,48,0.10);
+  --text: #E0E0E0;
+  --text-secondary: #AAAAAA;
+  --text-muted: #8A8A8A;
+  --border: #333333;
+  --border-light: #2A2A2A;
+  --highlight: #FF4030;
+  --surface: #1A1A1A;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); }
+body { line-height: 1.85; letter-spacing: 0.025em; font-feature-settings: "palt"; }
+
+.top-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 48px;
+  background: var(--bg); border-top: 3px solid var(--accent);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; z-index: 100;
+}
+.brand { font-weight: 700; letter-spacing: 0.05em; font-size: 14px; }
+.brand .accent { color: var(--accent-warm); }
+.theme-toggle {
+  background: transparent; border: 1px solid var(--border); color: var(--text);
+  padding: 4px 12px; border-radius: 2px; font-family: var(--font-mono);
+  font-size: 11px; cursor: pointer;
+}
+.theme-toggle:hover { background: var(--card-hover); }
+
+.layout { display: flex; padding-top: 48px; }
+.sidebar {
+  width: 240px; position: fixed; left: 0; top: 48px; bottom: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: 32px 24px; overflow-y: auto;
+}
+.sidebar h3 {
+  font-size: 11px; letter-spacing: 0.15em; color: var(--text-muted);
+  text-transform: uppercase; margin-bottom: 16px; font-weight: 500;
+}
+.sidebar ul { list-style: none; }
+.sidebar li { margin-bottom: 8px; }
+.sidebar a {
+  color: var(--text); text-decoration: none; font-size: 13px;
+  display: block; padding: 4px 0; transition: color 0.2s;
+}
+.sidebar a:hover { color: var(--accent-warm); }
+.sidebar a .num { color: var(--text-muted); font-family: var(--font-mono); margin-right: 8px; }
+
+.main {
+  margin-left: 240px; max-width: 880px; padding: 64px 48px;
+  font-family: var(--font-serif);
+}
+.main h1 {
+  font-family: var(--font); font-size: 32px; font-weight: 700;
+  margin-bottom: 8px; letter-spacing: 0.02em;
+}
+.subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 48px; }
+.meta-line {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+  margin-bottom: 64px; padding-bottom: 24px; border-bottom: 1px solid var(--border-light);
+}
+
+.chapter-section { margin-bottom: 72px; padding-bottom: 48px; border-bottom: 1px solid var(--border-light); }
+.chapter-section:last-child { border-bottom: none; }
+.chapter-num {
+  font-family: var(--font-mono); font-size: 11px; color: var(--accent-warm);
+  letter-spacing: 0.15em; margin-bottom: 8px; text-transform: uppercase;
+}
+.chapter-title {
+  font-family: var(--font); font-size: 22px; font-weight: 700;
+  margin-bottom: 24px; color: var(--text);
+}
+.main p { margin-bottom: 16px; text-indent: 1em; }
+.main p:first-of-type { text-indent: 0; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px; margin: 32px 0;
+}
+.stat {
+  border: 1px solid var(--border); padding: 16px; background: var(--card);
+}
+.stat-label { font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 8px; }
+.stat-value { font-family: var(--font-mono); font-size: 22px; color: var(--accent-warm); font-weight: 700; }
+.stat-note { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
+
+table {
+  width: 100%; border-collapse: collapse; margin: 24px 0;
+  font-family: var(--font); font-size: 13px;
+}
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); }
+th { background: var(--surface); font-weight: 600; color: var(--text-secondary); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+td.num { font-family: var(--font-mono); text-align: right; color: var(--accent-warm); }
+td.tag { font-family: var(--font-mono); font-size: 11px; }
+
+.timeline {
+  position: relative; margin: 32px 0; padding-left: 32px;
+  border-left: 2px solid var(--accent-warm);
+}
+.epoch { margin-bottom: 32px; position: relative; }
+.epoch::before {
+  content: ""; position: absolute; left: -38px; top: 6px;
+  width: 12px; height: 12px; background: var(--accent-warm); border-radius: 50%;
+}
+.epoch-period {
+  font-family: var(--font-mono); font-size: 11px; color: var(--accent-warm);
+  letter-spacing: 0.1em; margin-bottom: 4px;
+}
+.epoch-title { font-family: var(--font); font-weight: 700; margin-bottom: 4px; }
+.epoch-detail { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+
+.kpi-list { list-style: none; }
+.kpi-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-family: var(--font); font-size: 13px; }
+.kpi-list li:last-child { border-bottom: none; }
+.kpi-status { font-family: var(--font-mono); }
+.pass { color: #1B7F3A; }
+.warn { color: #C77700; }
+
+footer {
+  margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--border);
+  font-family: var(--font); font-size: 11px; color: var(--text-muted);
+}
+
+@media (max-width: 1000px) {
+  .sidebar { position: static; width: 100%; height: auto; padding: 16px 24px; }
+  .main { margin-left: 0; padding: 32px 24px; }
+  .layout { flex-direction: column; }
+}
+@media print {
+  .sidebar, .top-bar, .theme-toggle { display: none; }
+  .main { margin-left: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="top-bar">
+  <div class="brand">HTP-DB · <span class="accent">Human Text Production</span></div>
+  <button class="theme-toggle" onclick="toggleTheme()">DARK</button>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <h3>目次</h3>
+    <ul>
+      <li><a href="#overview"><span class="num">01</span>概要</a></li>
+      <li><a href="#metrics"><span class="num">02</span>主要指標</a></li>
+      <li><a href="#timeline"><span class="num">03</span>テキスト生産の時代</a></li>
+      <li><a href="#regions"><span class="num">04</span>言語圏分布</a></li>
+      <li><a href="#sources"><span class="num">05</span>真実層・出典</a></li>
+      <li><a href="#discrepancies"><span class="num">06</span>乖離の透明化</a></li>
+      <li><a href="#cross-refs"><span class="num">07</span>既存DB接続</a></li>
+      <li><a href="#kpi"><span class="num">08</span>品質ゲート</a></li>
+      <li><a href="#roadmap"><span class="num">09</span>Wave 2/3 ロードマップ</a></li>
+    </ul>
+  </nav>
+
+  <main class="main">
+    <h1>人類が生成した文字・テキストの量</h1>
+    <p class="subtitle">Human Text Production Database — Wave 1-4 完走 (BC3200-2026)</p>
+    <p class="meta-line">DB ID: htp · Created: 2026-05-15 · Wave: 1-4 完走 · Records: 44 · Cross-refs: 15 · Sources: 18 · Verified: 59.1% · 言語圏: 8/9 カバー</p>
+
+    <section class="chapter-section" id="overview">
+      <div class="chapter-num">Chapter 01</div>
+      <h2 class="chapter-title">概要</h2>
+      <p>HTP-DB は、人類が各時代に生み出した文字・テキストの総量を体系的に推定するデータベースである。楔形文字の発明（紀元前 3200 年頃）から、AI 生成テキストが人間生成テキストと並走しはじめた現代（2022 年以降）までの約 5,200 年を、媒体・言語圏・推定方法ごとに記録する。</p>
+      <p>Wave 1-4 完走により、5,200 年の全期間を被覆した。Wave 1（1450-2026）は印刷とデジタルを Buringh & van Zanden（2009）+ UNESCO + IDC で固める。Wave 2（500-1450）は Buringh（2011）の中世写本期推計を中核に、宋代印刷術と古典イスラム期で三極バランスを取る。Wave 3（BC3200-AD500）は CDLI 楔形文字・Oxyrhynchus パピルス・Perseus/TLG 古典コーパスで古代を埋める。Wave 4 はサンスクリット・マヤ・ゲエズと AI 生成テキスト（2023-）を追加し、欧米中心からの脱却を試みた。</p>
+      <p>このデータベースは、ミラツクが構想する補論「情報生産の 2030-2100」の歴史根拠層として機能する。動詞の転換、すなわち「書き写す → 印刷する → 発信する → 共に生成する」という四段階のシフトを、量的データで裏打ちすることを意図する。Wave 4 で AI 生成テキストが 2025 年に量的に人類のデジタルテキスト総量に並ぶ可能性を示唆する初期推定値を含めた。</p>
+    </section>
+
+    <section class="chapter-section" id="metrics">
+      <div class="chapter-num">Chapter 02</div>
+      <h2 class="chapter-title">主要指標</h2>
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-label">RECORDS</div>
+          <div class="stat-value">44</div>
+          <div class="stat-note">Wave 1-4 完走</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">SOURCES</div>
+          <div class="stat-value">18</div>
+          <div class="stat-note">authority_tier 1: 14 / 2: 4</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">VERIFIED RATE</div>
+          <div class="stat-value">59.1%</div>
+          <div class="stat-note">26 verified / 18 estimated (古代誤差幅大)</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">URL LIVE</div>
+          <div class="stat-value">100%</div>
+          <div class="stat-note">18 / 18 verified 2026-05-15</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">CROSS REFS</div>
+          <div class="stat-value">15</div>
+          <div class="stat-note">既存64DB + CLA/FVCP/Megatrend 接続</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">REGIONS</div>
+          <div class="stat-value">8/9</div>
+          <div class="stat-note">欧米中心脱却・全期間カバー</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">期間カバー</div>
+          <div class="stat-value">5,226 年</div>
+          <div class="stat-note">BC3200 〜 AD2026</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">媒体</div>
+          <div class="stat-value">12</div>
+          <div class="stat-note">楔形文字 → AI生成テキスト</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter-section" id="timeline">
+      <div class="chapter-num">Chapter 03</div>
+      <h2 class="chapter-title">テキスト生産の時代</h2>
+      <p>近世から現代までのテキスト生産は、媒体の決定的転換点で爆発的に増えてきた。Buringh & van Zanden の体系的推計と IDC の現代統計を接続すると、生産量はおよそ 14 桁にわたって増加する。</p>
+
+      <div class="timeline">
+        <div class="epoch">
+          <div class="epoch-period">BC3200-BC2000 楔形文字初期</div>
+          <div class="epoch-title">100,000 粘土板</div>
+          <div class="epoch-detail">シュメール初期王朝期。CDLI カタログ収録分。最初期の行政記録と神話記述。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">BC800-BC300 古典ギリシア</div>
+          <div class="epoch-title">32,100,000 語</div>
+          <div class="epoch-detail">Perseus Digital Library 収録の現存ギリシア語コーパス。Homer/Plato/Aristotle/悲劇/歴史記述。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">BC200-AD500 古典ラテン</div>
+          <div class="epoch-title">16,300,000 語</div>
+          <div class="epoch-detail">Perseus 収録の現存ラテン語コーパス。共和制末期からアウグストゥス時代、ローマ帝国全期、古代末期まで。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">9世紀 カロリング・ルネサンス</div>
+          <div class="epoch-title">91,000 写本 / 100年</div>
+          <div class="epoch-detail">Buringh 2011 の中世写本生産モデル推計のピーク前期。シャルルマーニュ復興の成果。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">12世紀 12世紀ルネサンス</div>
+          <div class="epoch-title">768,000 写本 / 100年</div>
+          <div class="epoch-detail">11世紀の5.7倍へ急増。アリストテレス受容、大学誕生、スコラ哲学準備期。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">960-1279 宋代</div>
+          <div class="epoch-title">5,000,000 印刷本</div>
+          <div class="epoch-detail">中国で木版印刷が技術として確立。グーテンベルクの 250 年前に商業印刷を実現。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">14世紀 紙写本期</div>
+          <div class="epoch-title">2,747,000 写本 / 100年</div>
+          <div class="epoch-detail">羊皮紙から紙へ。複製コストが下がり、ペスト後も生産は減少しなかった。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">15世紀 写本期末</div>
+          <div class="epoch-title">5,000,000 写本 / 100年</div>
+          <div class="epoch-detail">欧州ラテン圏の紙写本生産。修道院・写字室の最盛期。Buringh の生産モデル推計。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">1454-1500 揺籃期</div>
+          <div class="epoch-title">12,500,000 印刷本</div>
+          <div class="epoch-detail">グーテンベルク活版以降の初期 46 年。ISTC（インキュナブラ・カタログ）由来の verified データ。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">16世紀</div>
+          <div class="epoch-title">217,000,000 印刷本</div>
+          <div class="epoch-detail">100 年で前期の 17 倍。宗教改革と出版産業の急成長。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">17世紀</div>
+          <div class="epoch-title">545,000,000 印刷本</div>
+          <div class="epoch-detail">科学革命期。学術出版が急増。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">18世紀</div>
+          <div class="epoch-title">1,000,000,000 印刷本</div>
+          <div class="epoch-detail">啓蒙時代。10 億冊（推定）に到達。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">20世紀</div>
+          <div class="epoch-title">70,000,000 ユニーク書名</div>
+          <div class="epoch-detail">UNESCO + Google Books による現代累計。新聞・雑誌は別系統。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2010</div>
+          <div class="epoch-title">1.2 ゼタバイト / 年</div>
+          <div class="epoch-detail">IDC Global DataSphere。デジタルデータ全体（テキスト以外含む）。1 ZB = 10²¹ バイト。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2020</div>
+          <div class="epoch-title">64.2 ZB / 年</div>
+          <div class="epoch-detail">10 年で 53 倍。スマートフォン・SNS・IoT 普及。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2023</div>
+          <div class="epoch-title">120 ZB / 年</div>
+          <div class="epoch-detail">ChatGPT 公開後の初年。AI 生成テキストの量的記録が始まる。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2025（予測）</div>
+          <div class="epoch-title">150-200 ZB / 年</div>
+          <div class="epoch-detail">IDC 予測。範囲表示は推定下限・上限を保持する設計（楽観バイアス警告付き）。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2023 AI 生成テキスト初年</div>
+          <div class="epoch-title">100-2,000 兆 tokens</div>
+          <div class="epoch-detail">ChatGPT 公開後の初年。AI 生成テキストの量的記録が始まる。推定幅は極めて広い（gta_status=estimated, confidence_band=very_wide）。</div>
+        </div>
+        <div class="epoch">
+          <div class="epoch-period">2025（予測）AI 生成テキスト</div>
+          <div class="epoch-title">1-20 京 tokens</div>
+          <div class="epoch-detail">人類のデジタルテキスト総量に量的に並ぶ可能性。情報生産における動詞「共に生成する」が定着する境界年。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter-section" id="regions">
+      <div class="chapter-num">Chapter 04</div>
+      <h2 class="chapter-title">言語圏分布</h2>
+      <p>欧米中心ソースに依存することの再発防止として、9 言語圏を独立カラムで管理し、起動時に欧米偏重を検出して WARN を発出する設計にした。Wave 1 では 5 圏のみカバーされており、未カバー 4 圏は Wave 2-3 で補完する。</p>
+
+      <table>
+        <thead><tr><th>言語圏</th><th>主要言語</th><th>Coverage</th><th>主データ</th></tr></thead>
+        <tbody>
+          <tr><td>欧州ラテン圏</td><td>lat / fra / ita / spa / eng / deu</td><td class="tag pass">充足</td><td>Buringh 2011 中世 + Buringh 2009 印刷 + Perseus Latin</td></tr>
+          <tr><td>欧州非ラテン圏</td><td>grc / rus / pol / ces / ell</td><td class="tag pass">充足</td><td>Perseus + TLG ギリシア語コーパス</td></tr>
+          <tr><td>漢字圏</td><td>zho / jpn / kor / vie</td><td class="tag pass">充足</td><td>Sinica + 唐宋元明（永楽大典含む）</td></tr>
+          <tr><td>アラビア・イスラム圏</td><td>ara / fas / tur / urd</td><td class="tag pass">充足</td><td>Shamela + 古典・後古典イスラム期</td></tr>
+          <tr><td>南アジア</td><td>san / hin / ben / tam</td><td class="tag warn">部分</td><td>SARIT + GRETIL Sanskrit 推定</td></tr>
+          <tr><td>メソアメリカ</td><td>myn / nci</td><td class="tag warn">部分</td><td>Coe & Van Stone Maya 推定（誤差幅大）</td></tr>
+          <tr><td>アフリカ固有圏</td><td>amh / gez / swa</td><td class="tag warn">部分</td><td>Ge'ez 30K + エジプト ヒエログリフ・パピルス</td></tr>
+          <tr><td>アメリカ大陸（近代）</td><td>eng / spa / por</td><td class="tag pass">充足</td><td>UNESCO / IDC グローバル集計に含む</td></tr>
+          <tr><td>グローバル合計</td><td>—</td><td class="tag pass">充足</td><td>Hilbert-Lopez 2011 + IDC + UNESCO + AI 生成</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="sources">
+      <div class="chapter-num">Chapter 05</div>
+      <h2 class="chapter-title">真実層・出典</h2>
+      <p>複数の推定モデルが食い違うとき、結論を 1 つに収束させるのではなく、層別固定と差分注記で透明性を保つ。Buringh、IDC、UNESCO を期間別に正本とし、補助ソースは別 tier で記録する。</p>
+
+      <table>
+        <thead><tr><th>ソース</th><th>カバー期間</th><th>Tier</th><th>License</th><th>Live</th></tr></thead>
+        <tbody>
+          <tr><td>Buringh & van Zanden (2009)</td><td>500-1800</td><td class="tag">1</td><td>Academic</td><td class="tag pass">✓</td></tr>
+          <tr><td>IDC Global DataSphere</td><td>1986-2026</td><td class="tag">1</td><td>Proprietary (free summary)</td><td class="tag pass">✓</td></tr>
+          <tr><td>UNESCO UIS Books</td><td>1950-2024</td><td class="tag">1</td><td>UNESCO Open</td><td class="tag pass">✓</td></tr>
+          <tr><td>Sinica 漢籍</td><td>antiquity-18c</td><td class="tag">1</td><td>Free domestic</td><td class="tag pass">✓</td></tr>
+          <tr><td>Shamela (peer-reviewed)</td><td>7c-modern</td><td class="tag">1</td><td>Free non-commercial</td><td class="tag pass">✓</td></tr>
+          <tr><td>CDLI Cuneiform</td><td>BC3350-AD0</td><td class="tag">1</td><td>CC BY-SA 4.0</td><td class="tag pass">✓</td></tr>
+          <tr><td>OWID Books</td><td>1451-2024</td><td class="tag">2</td><td>CC BY 4.0</td><td class="tag pass">✓</td></tr>
+          <tr><td>Febvre & Martin (1958)</td><td>1450-1800</td><td class="tag">2</td><td>Academic</td><td class="tag pass">✓</td></tr>
+          <tr><td>Eisenstein (1979)</td><td>1460-1800</td><td class="tag">2</td><td>Academic</td><td class="tag pass">✓</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="discrepancies">
+      <div class="chapter-num">Chapter 06</div>
+      <h2 class="chapter-title">乖離の透明化</h2>
+      <p>ソース間の不一致は、どちらかを「正解」と決めずに、専用テーブルに乖離として記録する。書き換えではなく繋ぐ。Wave 1 では 2 件を記録した。</p>
+      <table>
+        <thead><tr><th>期間</th><th>Source A</th><th>Source B</th><th>解決方針</th></tr></thead>
+        <tbody>
+          <tr><td>1986 baseline</td><td>IDC: 2.6 EB</td><td>UNESCO: —</td><td class="tag">no_consensus（単位非互換）</td></tr>
+          <tr><td>17-18c Europe</td><td>Buringh: 1B 印刷本</td><td>Febvre-Martin: 物語埋込</td><td class="tag">adopt_a（系統的表化）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="cross-refs">
+      <div class="chapter-num">Chapter 07</div>
+      <h2 class="chapter-title">既存DB接続 15件</h2>
+      <p>新規 DB は単独で完成させない。生態系として組み込むことを起点に設計した。Wave 1 で 10 件、Wave 4 で 5 件追加し、合計 15 件の cross-ref を既存 64 DB と構築済み。</p>
+      <table>
+        <thead><tr><th>DB</th><th>接続キー</th><th>関係</th><th>note</th></tr></thead>
+        <tbody>
+          <tr><td class="tag">TA</td><td>year</td><td class="tag">supports</td><td>印刷・デジタル加速がテキスト量増加と対応</td></tr>
+          <tr><td class="tag">CDH</td><td>medium × year</td><td class="tag">supports</td><td>印刷コスト逓減がテキスト量増加の駆動因</td></tr>
+          <tr><td class="tag">CI</td><td>language_region</td><td class="tag">extends</td><td>言語圏別文化生産との照合</td></tr>
+          <tr><td class="tag">SI</td><td>year × medium</td><td class="tag">supports</td><td>印刷革命・電信・インターネットが SI 通信革命と重複</td></tr>
+          <tr><td class="tag">MG</td><td>concept</td><td class="tag">extends</td><td>知識経済・McLuhan 媒体理論の基盤</td></tr>
+          <tr><td class="tag">PESTLE</td><td>year × region</td><td class="tag">contradicts</td><td>検閲イベントが量減少と対応（反証事例）</td></tr>
+          <tr><td class="tag">UPR</td><td>year</td><td class="tag">extends</td><td>学術テキストの現代部分を補完</td></tr>
+          <tr><td class="tag">TK</td><td>language_region</td><td class="tag">extends</td><td>非文字圏の明示（口承文化）</td></tr>
+          <tr><td class="tag">GC-DB</td><td>concept</td><td class="tag">supports</td><td>Romer 型知識スピルオーバーの量的基盤</td></tr>
+          <tr><td class="tag">FTT-DB v2</td><td>year × technology</td><td class="tag">supports</td><td>AI 生成テキスト出現 2022 の転換点</td></tr>
+          <tr><td class="tag">CLA</td><td>year × paradigm</td><td class="tag">supports</td><td>1454/1991/2022 を CLA 因果階層分析のパラダイム転換点として接続</td></tr>
+          <tr><td class="tag">SI-Framework</td><td>year × medium</td><td class="tag">supports</td><td>グーテンベルク・電信・インターネット・AI 生成の 4 構造的通信転換</td></tr>
+          <tr><td class="tag">Megatrend</td><td>concept:ai_text</td><td class="tag">extends</td><td>AI 生成テキストを新メガトレンド軸として量的に裏付け</td></tr>
+          <tr><td class="tag">FVCP</td><td>theme:information_production</td><td class="tag">supports</td><td>補論「情報生産の 2030-2100」の歴史根拠層として機能</td></tr>
+          <tr><td class="tag">Manufacturing-Orchestra</td><td>theme:orchestra</td><td class="tag">mirrors</td><td>製造補論との動詞転換並走（育てる/共に生成する）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="chapter-section" id="kpi">
+      <div class="chapter-num">Chapter 08</div>
+      <h2 class="chapter-title">品質ゲート</h2>
+      <p>件数を成果指標にしない。検証通過率・URL live 率・cross_refs 件数の三本柱を KPI とする。</p>
+      <ul class="kpi-list">
+        <li><span>verified_rate（全期間）</span><span class="kpi-status warn">59.1%（古代 estimated 18 件含む）</span></li>
+        <li><span>verified_rate（Wave 1-2 近世以降）</span><span class="kpi-status pass">80.6% 近世以降は高品質</span></li>
+        <li><span>source_url_live_rate</span><span class="kpi-status pass">100% PASS (18/18)</span></li>
+        <li><span>cross_refs ≥ 10</span><span class="kpi-status pass">15 PASS（CLA/FVCP/Megatrend/Manufacturing 追加）</span></li>
+        <li><span>estimation_traceability（推定値の出典追跡率）</span><span class="kpi-status pass">100% PASS</span></li>
+        <li><span>abstain 明示</span><span class="kpi-status pass">2 件記録（unit非互換 + Maya 範囲）</span></li>
+        <li><span>言語圏 coverage</span><span class="kpi-status pass">8/9 圏（Wave 4 で目標達成）</span></li>
+        <li><span>期間カバー</span><span class="kpi-status pass">5,226 年（BC3200-2026）</span></li>
+      </ul>
+    </section>
+
+    <section class="chapter-section" id="roadmap">
+      <div class="chapter-num">Chapter 09</div>
+      <h2 class="chapter-title">Wave 1-4 完走と Wave 5+ 想定</h2>
+      <p>Wave 1-4 の四段階で BC3200 から AD2026 までの 5,226 年を被覆した。Wave 5 以降は深化のフェーズに入る。年代別誤差幅の縮小、AI 生成テキストの精密化、補論「情報生産の 2030-2100」との双方向統合が次の焦点である。</p>
+      <table>
+        <thead><tr><th>Wave</th><th>スコープ</th><th>状態</th><th>主データ</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>近世以降 1450-2026</td><td class="tag pass">完走</td><td>Buringh & van Zanden + IDC + UNESCO + Sinica + Shamela</td></tr>
+          <tr><td>2</td><td>中世 500-1450</td><td class="tag pass">完走</td><td>Buringh 2011 + 宋代印刷 + 古典イスラム</td></tr>
+          <tr><td>3</td><td>古代 BC3200-AD500</td><td class="tag pass">完走</td><td>CDLI 楔形文字 + Oxyrhynchus + Perseus/TLG + エジプト</td></tr>
+          <tr><td>4</td><td>言語圏拡張 + AI時代</td><td class="tag pass">完走</td><td>SARIT + Maya + Ge'ez + AI 2023-2025 + FVCP 統合</td></tr>
+          <tr><td>5</td><td>誤差幅縮小 + 深化</td><td>想定</td><td>Wave 4 estimated レコードの一次ソース照合</td></tr>
+          <tr><td>6</td><td>動詞転換補論統合</td><td>想定</td><td>「情報生産の 2030-2100」FVCP 起動と双方向反映</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      <p>HTP-DB Wave 1-4 完走 · /db-master 経由 · 2026-05-15 · 経路 B (実データDB) · db-timeseries-builder + db-text-corpus-builder + db-people-builder</p>
+      <p>赤白CI textbook.html style 準拠 · favicon: https://esse-sense.com/favicon.ico</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+function toggleTheme() {
+  const cur = document.body.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.body.setAttribute('data-theme', next);
+  document.querySelector('.theme-toggle').textContent = next === 'light' ? 'DARK' : 'LIGHT';
+  localStorage.setItem('htp-theme', next);
+}
+const saved = localStorage.getItem('htp-theme');
+if (saved) {
+  document.body.setAttribute('data-theme', saved);
+  document.querySelector('.theme-toggle').textContent = saved === 'light' ? 'DARK' : 'LIGHT';
+}
+</script>
+</body>
+</html>
