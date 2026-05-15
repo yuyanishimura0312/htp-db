@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>図解版 ── 四つの量爆発と希少化の系譜</title>
+  <meta name="description" content="HTP-DB レポート + scarcity + transitions 補論の内容を 10 の大型 SVG で図解化したビジュアル版。BC3200 から AD2026 までの量爆発を一望する">
+  <link rel="icon" href="https://esse-sense.com/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFFFF; --card: #FFFFFF;
+      --accent: #121212;
+      --accent-warm: #CC1400; --accent-warm-soft: #B01200;
+      --accent-muted: rgba(204,20,0,0.06);
+      --text: #121212; --text-secondary: #555555; --text-muted: #6B6B6B;
+      --border: #D9D9D9; --border-light: #EEEEEE;
+      --surface: #F7F7F5;
+      --font: "Noto Sans JP", "Hiragino Sans", -apple-system, sans-serif;
+      --font-serif: "Noto Serif JP", "Hiragino Mincho ProN", Georgia, serif;
+    }
+    [data-theme="dark"] .top-bar { border-top-color: #E0E0E0; }
+    [data-theme="dark"] {
+      --bg: #121212; --card: #1A1A1A;
+      --accent: #E0E0E0;
+      --accent-warm: #FF4030;
+      --accent-muted: rgba(255,64,48,0.10);
+      --text: #E0E0E0; --text-secondary: #AAAAAA; --text-muted: #8A8A8A;
+      --border: #333333; --border-light: #2A2A2A;
+      --surface: #1A1A1A;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-serif); color: var(--text); background: var(--bg); line-height: 1.95; letter-spacing: 0.025em; font-feature-settings: "palt"; min-height: 100vh; transition: background 0.2s, color 0.2s; }
+    a { color: var(--accent-warm); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .top-bar { background: var(--bg); border-top: 3px solid #121212; border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 48px; position: sticky; top: 0; z-index: 100; }
+    .top-bar-brand { font-family: var(--font); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .top-bar-brand span { color: var(--accent-warm); }
+    .top-bar-actions { display: flex; align-items: center; gap: 12px; }
+    .back-link { font-family: var(--font); font-size: 0.75rem; color: var(--text-muted); }
+    .back-link:hover { color: var(--accent-warm); }
+    .theme-toggle { background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; padding: 4px 10px; font-size: 0.72rem; font-family: var(--font); letter-spacing: 0.05em; }
+    .theme-toggle:hover { border-color: var(--accent-warm); color: var(--accent-warm); }
+
+    .book-cover { max-width: 960px; margin: 0 auto; padding: 80px 24px 56px; text-align: center; border-bottom: 1px solid var(--border); }
+    .book-cover-tag { font-family: var(--font); font-size: 0.7rem; letter-spacing: 0.18em; color: var(--accent-warm); text-transform: uppercase; margin-bottom: 24px; }
+    .book-cover-title { font-family: var(--font-serif); font-size: 2.4rem; font-weight: 900; line-height: 1.35; letter-spacing: 0.02em; color: var(--text); margin-bottom: 16px; }
+    .book-cover-title em { font-style: normal; color: var(--accent-warm); }
+    .book-cover-subtitle { font-family: var(--font-serif); font-size: 1.05rem; color: var(--text-secondary); line-height: 1.7; margin: 24px auto 36px; max-width: 720px; }
+    .book-cover-meta { font-family: var(--font); font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.04em; }
+    .book-cover-meta span { margin: 0 8px; }
+    .book-cover-divider { width: 60px; height: 2px; background: var(--accent-warm); margin: 28px auto; }
+
+    .figures { max-width: 1000px; margin: 0 auto; padding: 56px 24px 96px; }
+    .fig-block { margin-bottom: 96px; }
+    .fig-block:last-child { margin-bottom: 0; }
+    .fig-header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    .fig-num { font-family: var(--font); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; color: var(--accent-warm); text-transform: uppercase; margin-bottom: 8px; }
+    .fig-title { font-family: var(--font-serif); font-size: 1.55rem; font-weight: 700; line-height: 1.4; color: var(--text); }
+    .fig-lead { font-family: var(--font-serif); font-size: 0.95rem; color: var(--text-secondary); margin: 14px 0 0; line-height: 1.75; }
+    figure { margin: 0; padding: 28px; background: rgba(204,20,0,0.02); border-top: 1px solid #CC1400; border-bottom: 1px solid #CC1400; }
+    figure svg { display: block; width: 100%; height: auto; }
+    figcaption { font-family: var(--font); font-size: 0.78rem; color: var(--text-muted); margin-top: 16px; text-align: center; letter-spacing: 0.04em; line-height: 1.6; }
+
+    [data-theme="dark"] svg text { fill: #F0F0F0 !important; }
+    [data-theme="dark"] svg text[fill="#CC1400"] { fill: #FF5A4A !important; }
+    [data-theme="dark"] svg text[fill="#121212"] { fill: #F0F0F0 !important; }
+    [data-theme="dark"] svg text[fill="#555555"], [data-theme="dark"] svg text[fill="#555"] { fill: #CCCCCC !important; }
+    [data-theme="dark"] svg text[fill="#6B6B6B"] { fill: #BBBBBB !important; }
+    [data-theme="dark"] svg rect[fill="#FFFFFF"], [data-theme="dark"] svg rect[fill="#FFF"], [data-theme="dark"] svg rect[fill="white"] { fill: #1A1A1A !important; }
+    [data-theme="dark"] svg rect[fill="#F7F7F5"] { fill: #222222 !important; }
+    [data-theme="dark"] svg line[stroke="#555555"] { stroke: #CCCCCC !important; }
+    [data-theme="dark"] svg line[stroke="#EEEEEE"] { stroke: #2A2A2A !important; }
+    [data-theme="dark"] svg line[stroke="#D9D9D9"] { stroke: #444444 !important; }
+    [data-theme="dark"] svg line[stroke="#CC1400"] { stroke: #FF5A4A !important; }
+    [data-theme="dark"] svg rect[stroke="#D9D9D9"] { stroke: #444444 !important; }
+    [data-theme="dark"] svg rect[stroke="#CC1400"] { stroke: #FF5A4A !important; }
+    [data-theme="dark"] svg circle[fill="#CC1400"] { fill: #FF5A4A !important; }
+    [data-theme="dark"] svg circle[stroke="#CC1400"] { stroke: #FF5A4A !important; }
+    [data-theme="dark"] svg path[stroke="#CC1400"] { stroke: #FF5A4A !important; }
+    [data-theme="dark"] svg path[fill="#CC1400"] { fill: #FF5A4A !important; }
+    [data-theme="dark"] svg polygon[stroke="#CC1400"] { stroke: #FF5A4A !important; }
+    [data-theme="dark"] figure { background: rgba(255,90,74,0.06) !important; border-top-color: #FF5A4A !important; border-bottom-color: #FF5A4A !important; }
+    [data-theme="dark"] figcaption { color: #AAAAAA !important; }
+
+    .doc-footer { max-width: 760px; margin: 0 auto; padding: 48px 24px 96px; border-top: 1px solid var(--border); font-family: var(--font); font-size: 0.78rem; color: var(--text-muted); line-height: 1.9; text-align: center; }
+    .doc-footer p { margin-bottom: 8px; }
+    .doc-footer a { color: var(--accent-warm); }
+
+    @media (max-width: 900px) {
+      .figures { padding: 32px 16px 64px; }
+      .fig-block { margin-bottom: 64px; }
+      .book-cover-title { font-size: 1.8rem; }
+      figure { padding: 16px; }
+    }
+    @media print { .top-bar, .theme-toggle { display: none; } .fig-block { page-break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="top-bar-brand">HTP-DB <span>HUMAN TEXT PRODUCTION</span></a>
+    <div class="top-bar-actions">
+      <a href="index.html" class="back-link">← DASHBOARD</a>
+      <a href="report.html" class="back-link">REPORT</a>
+      <a href="scarcity.html" class="back-link">SCARCITY</a>
+      <a href="transitions.html" class="back-link">TRANSITIONS</a>
+      <button class="theme-toggle" onclick="toggleTheme()">DARK / LIGHT</button>
+    </div>
+  </div>
+
+  <section class="book-cover">
+    <div class="book-cover-tag">VISUAL EDITION · 10 FIGURES · 2026.05</div>
+    <h1 class="book-cover-title">四つの量爆発と<em>—</em><br>希少化の系譜 図解版</h1>
+    <p class="book-cover-subtitle">HTP-DB レポート + scarcity + transitions 補論の内容を 10 の大型 SVG で図解化。BC3200 から AD2026 までを一望する</p>
+    <div class="book-cover-divider"></div>
+    <div class="book-cover-meta"><span>10 図解</span><span>·</span><span>5,226 年カバー</span><span>·</span><span>HTP-DB 47 records 基盤</span><span>·</span><span>テキスト最小化</span></div>
+  </section>
+
+<div class="figures">
+
+<!-- ============================================================
+     FIG 01 ── 5,226 年テキスト生産量推移（マスター時系列）
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 01 ── マスター時系列</div>
+    <div class="fig-title">5,226 年のテキスト生産量と四つの量爆発</div>
+    <p class="fig-lead">人類のテキスト生産は対数軸で 14 桁にわたって増加した。四つの転換点 (BC3200 文字誕生 / 1454 印刷革命 / 1986 デジタル誕生 / 2022 AI 共生期) を一つの図に重ね合わせる。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 480" xmlns="http://www.w3.org/2000/svg">
+      <!-- axes -->
+      <line x1="80" y1="420" x2="960" y2="420" stroke="#555555" stroke-width="1"/>
+      <line x1="80" y1="50" x2="80" y2="420" stroke="#555555" stroke-width="1"/>
+      <!-- gridlines -->
+      <g stroke="#EEEEEE" stroke-width="1" stroke-dasharray="2 2">
+        <line x1="80" y1="80" x2="960" y2="80"/>
+        <line x1="80" y1="130" x2="960" y2="130"/>
+        <line x1="80" y1="180" x2="960" y2="180"/>
+        <line x1="80" y1="230" x2="960" y2="230"/>
+        <line x1="80" y1="280" x2="960" y2="280"/>
+        <line x1="80" y1="330" x2="960" y2="330"/>
+        <line x1="80" y1="380" x2="960" y2="380"/>
+      </g>
+      <!-- y labels (log scale) -->
+      <g font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="end">
+        <text x="73" y="84">10¹⁸</text>
+        <text x="73" y="134">10¹⁵</text>
+        <text x="73" y="184">10¹²</text>
+        <text x="73" y="234">10⁹</text>
+        <text x="73" y="284">10⁶</text>
+        <text x="73" y="334">10³</text>
+        <text x="73" y="384">1</text>
+      </g>
+      <text x="36" y="225" font-family="Noto Sans JP" font-size="11" fill="#555555" transform="rotate(-90 36 225)" text-anchor="middle">テキスト量（log scale）</text>
+      <!-- x labels (BC3300, AD0, 500, 1000, 1500, 1900, 2025) -->
+      <g font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">
+        <text x="130" y="438">BC3300</text>
+        <text x="280" y="438">AD0</text>
+        <text x="430" y="438">500</text>
+        <text x="580" y="438">1000</text>
+        <text x="730" y="438">1500</text>
+        <text x="870" y="438">1900</text>
+        <text x="950" y="438">2025</text>
+      </g>
+      <!-- inflection vertical lines -->
+      <g stroke="#CC1400" stroke-width="1.5" stroke-dasharray="3 3">
+        <line x1="130" y1="50" x2="130" y2="420"/>
+        <line x1="730" y1="50" x2="730" y2="420"/>
+        <line x1="897" y1="50" x2="897" y2="420"/>
+        <line x1="943" y1="50" x2="943" y2="420"/>
+      </g>
+      <g font-family="Noto Sans JP" font-size="10" fill="#CC1400" font-weight="700" text-anchor="middle">
+        <text x="130" y="40">BC3200</text>
+        <text x="130" y="28">文字誕生</text>
+        <text x="730" y="40">1454</text>
+        <text x="730" y="28">活版印刷</text>
+        <text x="897" y="40">1986</text>
+        <text x="897" y="28">デジタル</text>
+        <text x="943" y="40">2022</text>
+        <text x="943" y="28">AI 共生</text>
+      </g>
+      <!-- main curve (human text production, log-projected) -->
+      <polyline points="130,360 280,330 380,310 480,290 580,250 700,210 750,180 820,140 880,100 940,90"
+                fill="none" stroke="#CC1400" stroke-width="3"/>
+      <!-- data points -->
+      <g fill="#CC1400">
+        <circle cx="130" cy="360" r="5"/>
+        <circle cx="280" cy="330" r="5"/>
+        <circle cx="380" cy="310" r="5"/>
+        <circle cx="480" cy="290" r="5"/>
+        <circle cx="580" cy="250" r="5"/>
+        <circle cx="700" cy="210" r="5"/>
+        <circle cx="750" cy="180" r="5"/>
+        <circle cx="820" cy="140" r="5"/>
+        <circle cx="880" cy="100" r="5"/>
+        <circle cx="940" cy="90" r="5"/>
+      </g>
+      <!-- AI line (dotted, post-2022) -->
+      <line x1="940" y1="420" x2="950" y2="60" stroke="#121212" stroke-width="2" stroke-dasharray="5 3"/>
+      <circle cx="950" cy="60" r="6" fill="#121212"/>
+      <!-- labels along curve -->
+      <g font-family="Noto Sans JP" font-size="10" fill="#555555">
+        <text x="140" y="375">楔形文字</text>
+        <text x="290" y="345">パピルス</text>
+        <text x="490" y="305">中世写本</text>
+        <text x="595" y="245">12世紀ルネサンス</text>
+        <text x="710" y="225">9c カロリング</text>
+        <text x="760" y="195">印刷期</text>
+        <text x="830" y="155">新聞・出版</text>
+        <text x="880" y="115">デジタル</text>
+      </g>
+      <text x="900" y="65" font-family="Noto Sans JP" font-size="10" fill="#121212" font-weight="700">AI 2025</text>
+      <text x="900" y="78" font-family="Noto Sans JP" font-size="9" fill="#555555">10¹⁷ API tokens</text>
+      <!-- title in figure -->
+      <text x="500" y="20" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">人類テキスト生産量推移 ── 14 桁の弧と四つの転換点</text>
+    </svg>
+    <figcaption>FIG. 01 ── 出典: HTP-DB Wave 1-4 (47 records) + Buringh 2009/2011 + IDC Global DataSphere + Epoch AI 2024。実線=人類生成、破線=AI生成（推論時tokens）。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 02 ── 動詞転換 4 時代パネル
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 02 ── 動詞転換</div>
+    <div class="fig-title">書き写す → 印刷する → 発信する → 共に生成する</div>
+    <p class="fig-lead">テキスト生産の主役の動詞が時代ごとに変わる。媒体の決定的転換点で、生産行為そのものの意味が再定義される。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">動詞転換 4 時代パネル ── 主役の動詞が変わる</text>
+
+      <!-- four panels -->
+      <g>
+        <!-- Panel 1: 写本期 -->
+        <rect x="40" y="60" width="220" height="320" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+        <text x="150" y="90" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">写本期</text>
+        <text x="150" y="105" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">~ 1450</text>
+        <text x="150" y="160" font-family="Noto Serif JP" font-size="26" font-weight="900" fill="#121212" text-anchor="middle">書き写す</text>
+        <line x1="115" y1="180" x2="185" y2="180" stroke="#CC1400" stroke-width="1.5"/>
+        <text x="150" y="220" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">主役: 修道院・写字室</text>
+        <text x="150" y="240" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">道具: 羊皮紙・葦ペン</text>
+        <text x="150" y="260" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">単位: 写本 1 冊</text>
+        <text x="150" y="290" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">12c: 768,000 写本</text>
+        <text x="150" y="310" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">14c: 2,750,000 写本</text>
+        <text x="150" y="350" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">出典: Buringh 2011</text>
+
+        <!-- Panel 2: 印刷期 -->
+        <rect x="280" y="60" width="220" height="320" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+        <text x="390" y="90" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">印刷期</text>
+        <text x="390" y="105" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">1450 - 1985</text>
+        <text x="390" y="160" font-family="Noto Serif JP" font-size="26" font-weight="900" fill="#121212" text-anchor="middle">印刷する</text>
+        <line x1="355" y1="180" x2="425" y2="180" stroke="#CC1400" stroke-width="1.5"/>
+        <text x="390" y="220" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">主役: 出版社・新聞社</text>
+        <text x="390" y="240" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">道具: 活版・輪転機</text>
+        <text x="390" y="260" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">単位: 部数</text>
+        <text x="390" y="290" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">16c: 2.17 億部</text>
+        <text x="390" y="310" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">18c: 10 億部</text>
+        <text x="390" y="350" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">出典: Buringh & van Zanden 2009</text>
+
+        <!-- Panel 3: デジタル期 -->
+        <rect x="520" y="60" width="220" height="320" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+        <text x="630" y="90" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">デジタル期</text>
+        <text x="630" y="105" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">1986 - 2022</text>
+        <text x="630" y="160" font-family="Noto Serif JP" font-size="26" font-weight="900" fill="#121212" text-anchor="middle">発信する</text>
+        <line x1="595" y1="180" x2="665" y2="180" stroke="#CC1400" stroke-width="1.5"/>
+        <text x="630" y="220" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">主役: プラットフォーム</text>
+        <text x="630" y="240" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">道具: Web・SNS・API</text>
+        <text x="630" y="260" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">単位: バイト</text>
+        <text x="630" y="290" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">2010: 1.2 ZB</text>
+        <text x="630" y="310" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">2023: 120 ZB</text>
+        <text x="630" y="350" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">出典: Hilbert-Lopez 2011 + IDC</text>
+
+        <!-- Panel 4: AI 共生期 (highlight) -->
+        <rect x="760" y="60" width="220" height="320" fill="rgba(204,20,0,0.04)" stroke="#CC1400" stroke-width="2"/>
+        <text x="870" y="90" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">AI 共生期</text>
+        <text x="870" y="105" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">2022 - 2100</text>
+        <text x="870" y="160" font-family="Noto Serif JP" font-size="20" font-weight="900" fill="#CC1400" text-anchor="middle">共に生成する</text>
+        <line x1="820" y1="180" x2="920" y2="180" stroke="#CC1400" stroke-width="2"/>
+        <text x="870" y="220" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">主役: 人間 + LLM 協働</text>
+        <text x="870" y="240" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">道具: prompt・RAG・補助</text>
+        <text x="870" y="260" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">単位: tokens</text>
+        <text x="870" y="290" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">2025 API: 1.5×10¹⁷</text>
+        <text x="870" y="310" font-family="Noto Sans JP" font-size="11" fill="#CC1400" font-weight="700" text-anchor="middle">Web 記事 AI 52%</text>
+        <text x="870" y="350" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">出典: Epoch AI / Graphite 2025</text>
+
+        <!-- arrows between panels -->
+        <g stroke="#CC1400" stroke-width="2" fill="none">
+          <path d="M 264 220 L 275 220"/>
+          <path d="M 504 220 L 515 220"/>
+          <path d="M 744 220 L 755 220"/>
+        </g>
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,0 L6,4 L0,8 z" fill="#CC1400"/>
+          </marker>
+        </defs>
+      </g>
+    </svg>
+    <figcaption>FIG. 02 ── 4 時代パネル。動詞の主役が変わるとき、媒体・主役・道具・単位がすべて変化する。最右は現在進行中の AI 共生期。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 03 ── 印刷革命の希少化 10 対応
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 03 ── 10 対応</div>
+    <div class="fig-title">印刷革命で希少化した 10 のもの → AI 時代の対応</div>
+    <p class="fig-lead">量爆発が起きるとき、希少化するのは「情報そのもの」ではなく「情報を選び・編み・保証する仕事」である。印刷革命の十項目と AI 時代の対応を並べる。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">10 の希少化と AI 時代対応 ── ミラツク実装まで</text>
+
+      <!-- column headers -->
+      <g font-family="Noto Sans JP" font-size="11" font-weight="700" fill="#CC1400">
+        <text x="35" y="60">#</text>
+        <text x="80" y="60">印刷期に希少化</text>
+        <text x="370" y="60">事例 (年)</text>
+        <text x="540" y="60">AI 時代対応</text>
+        <text x="810" y="60">ミラツク実装</text>
+      </g>
+      <line x1="20" y1="68" x2="980" y2="68" stroke="#CC1400" stroke-width="2"/>
+
+      <!-- rows -->
+      <g font-family="Noto Sans JP" font-size="11" fill="#121212">
+        <!-- row 1 -->
+        <text x="35" y="98" font-weight="700" fill="#CC1400" font-family="Fira Code">01</text>
+        <text x="80" y="98">編集・校訂判断</text>
+        <text x="370" y="98" fill="#6B6B6B">Aldine Press (1495)</text>
+        <text x="540" y="98" font-weight="700">一次解釈・翻訳的編集</text>
+        <text x="810" y="98" fill="#6B6B6B">連載「〜のかたち」</text>
+        <line x1="20" y1="108" x2="980" y2="108" stroke="#EEEEEE"/>
+
+        <!-- row 2 -->
+        <text x="35" y="128" font-weight="700" fill="#CC1400" font-family="Fira Code">02</text>
+        <text x="80" y="128">権威認証</text>
+        <text x="370" y="128" fill="#6B6B6B">Royal Society (1660)</text>
+        <text x="540" y="128" font-weight="700">provenance 認証</text>
+        <text x="810" y="128" fill="#6B6B6B">source_url 100%</text>
+        <line x1="20" y1="138" x2="980" y2="138" stroke="#EEEEEE"/>
+
+        <!-- row 3 -->
+        <text x="35" y="158" font-weight="700" fill="#CC1400" font-family="Fira Code">03</text>
+        <text x="80" y="158">発掘・curation</text>
+        <text x="370" y="158" fill="#6B6B6B">Erasmus NT (1516)</text>
+        <text x="540" y="158" font-weight="700">非西洋・周縁知 curate</text>
+        <text x="810" y="158" fill="#6B6B6B">TK / Shamela / Sinica</text>
+        <line x1="20" y1="168" x2="980" y2="168" stroke="#EEEEEE"/>
+
+        <!-- row 4 -->
+        <text x="35" y="188" font-weight="700" fill="#CC1400" font-family="Fira Code">04</text>
+        <text x="80" y="188">個人筆跡・書簡</text>
+        <text x="370" y="188" fill="#6B6B6B">epistolary culture</text>
+        <text x="540" y="188" font-weight="700">対話・体験の親密性</text>
+        <text x="810" y="188" fill="#6B6B6B">研究者対談</text>
+        <line x1="20" y1="198" x2="980" y2="198" stroke="#EEEEEE"/>
+
+        <!-- row 5 -->
+        <text x="35" y="218" font-weight="700" fill="#CC1400" font-family="Fira Code">05</text>
+        <text x="80" y="218">沈黙・内省の文学</text>
+        <text x="370" y="218" fill="#6B6B6B">Montaigne (1580)</text>
+        <text x="540" y="218" font-weight="700">選ばない判断・余白</text>
+        <text x="810" y="218" fill="#6B6B6B">Futures II</text>
+        <line x1="20" y1="228" x2="980" y2="228" stroke="#EEEEEE"/>
+
+        <!-- row 6 -->
+        <text x="35" y="248" font-weight="700" fill="#CC1400" font-family="Fira Code">06</text>
+        <text x="80" y="248">発禁・地下文献</text>
+        <text x="370" y="248" fill="#6B6B6B">Index Librorum (1559)</text>
+        <text x="540" y="248" font-weight="700">規制下のテキスト</text>
+        <text x="810" y="248" fill="#6B6B6B">独立メディア</text>
+        <line x1="20" y1="258" x2="980" y2="258" stroke="#EEEEEE"/>
+
+        <!-- row 7 -->
+        <text x="35" y="278" font-weight="700" fill="#CC1400" font-family="Fira Code">07</text>
+        <text x="80" y="278">古写本コレクション</text>
+        <text x="370" y="278" fill="#6B6B6B">Bodleian (1602)</text>
+        <text x="540" y="278" font-weight="700">学術 DB 質保証ストック</text>
+        <text x="810" y="278" fill="#6B6B6B">HTP-DB / GC-DB / 60+</text>
+        <line x1="20" y1="288" x2="980" y2="288" stroke="#EEEEEE"/>
+
+        <!-- row 8 -->
+        <text x="35" y="308" font-weight="700" fill="#CC1400" font-family="Fira Code">08</text>
+        <text x="80" y="308">学位・読解能力認証</text>
+        <text x="370" y="308" fill="#6B6B6B">大学再強化</text>
+        <text x="540" y="308" font-weight="700">質問の質を立てる能力</text>
+        <text x="810" y="308" fill="#6B6B6B">Futures II「問いをより深く」</text>
+        <line x1="20" y1="318" x2="980" y2="318" stroke="#EEEEEE"/>
+
+        <!-- row 9 -->
+        <text x="35" y="338" font-weight="700" fill="#CC1400" font-family="Fira Code">09</text>
+        <text x="80" y="338">新知の発見</text>
+        <text x="370" y="338" fill="#6B6B6B">Encyclopédie (1751)</text>
+        <text x="540" y="338" font-weight="700">暗黙知・身体知</text>
+        <text x="810" y="338" fill="#6B6B6B">伝統知識DB / 妖怪DB</text>
+        <line x1="20" y1="348" x2="980" y2="348" stroke="#EEEEEE"/>
+
+        <!-- row 10 -->
+        <text x="35" y="368" font-weight="700" fill="#CC1400" font-family="Fira Code">10</text>
+        <text x="80" y="368">著者性 (authorship)</text>
+        <text x="370" y="368" fill="#6B6B6B">Statute of Anne (1710)</text>
+        <text x="540" y="368" font-weight="700">人間が責任を持つ判断</text>
+        <text x="810" y="368" fill="#6B6B6B">human-verified / Sentinel</text>
+      </g>
+
+      <line x1="20" y1="395" x2="980" y2="395" stroke="#CC1400" stroke-width="1"/>
+
+      <!-- arrows column to column -->
+      <g stroke="#CC1400" stroke-width="1.5" fill="none">
+        <path d="M 510 94 L 535 94" marker-end="url(#a3)"/>
+        <path d="M 510 124 L 535 124" marker-end="url(#a3)"/>
+        <path d="M 510 154 L 535 154" marker-end="url(#a3)"/>
+        <path d="M 510 184 L 535 184" marker-end="url(#a3)"/>
+        <path d="M 510 214 L 535 214" marker-end="url(#a3)"/>
+        <path d="M 510 244 L 535 244" marker-end="url(#a3)"/>
+        <path d="M 510 274 L 535 274" marker-end="url(#a3)"/>
+        <path d="M 510 304 L 535 304" marker-end="url(#a3)"/>
+        <path d="M 510 334 L 535 334" marker-end="url(#a3)"/>
+        <path d="M 510 364 L 535 364" marker-end="url(#a3)"/>
+      </g>
+      <defs>
+        <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L6,4 L0,8 z" fill="#CC1400"/>
+        </marker>
+      </defs>
+
+      <!-- key insight box -->
+      <rect x="100" y="430" width="800" height="120" fill="rgba(204,20,0,0.04)" stroke="#CC1400" stroke-width="1.5"/>
+      <text x="500" y="460" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#CC1400" text-anchor="middle">核心の発見</text>
+      <text x="500" y="490" font-family="Noto Sans JP" font-size="12" fill="#121212" text-anchor="middle">10 項目すべてが、量爆発以前には「希少化する」概念自体が存在しなかった</text>
+      <text x="500" y="510" font-family="Noto Sans JP" font-size="12" fill="#121212" text-anchor="middle">量が爆発した結果、社会がこれらを希少資源として認識し、制度を作り、市場を作る</text>
+      <text x="500" y="535" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#CC1400" text-anchor="middle">ミラツク 60+DB は既に 10 項目すべてに対応実装を持つ</text>
+
+      <text x="500" y="585" font-family="Noto Sans JP" font-size="11" fill="#6B6B6B" text-anchor="middle">出典: HTP-DB cross_refs + SI Framework knowledge_democracy events + 印刷史古典 (Eisenstein 1979 / Febvre & Martin 1958)</text>
+    </svg>
+    <figcaption>FIG. 03 ── 印刷期に希少化した 10 項目と AI 時代の対応、そしてミラツクの既存実装。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 04 ── 量爆発の三層構造（API/生成/累積）
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 04 ── 三層スタック</div>
+    <div class="fig-title">AI 時代の「量爆発」は三層に分かれる ── API 消費 / 新規生成 / 累積ストック</div>
+    <p class="fig-lead">「1-20 京 tokens」という当初の数字は、API 消費量と実生成量を取り違えると意味が反転する。三層を区別すると「人類超過」の真偽が見えてくる。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">三層スタック ── 同じ「2025」でも層が違えば数値が 500 倍違う</text>
+
+      <!-- Layer 1: API consumption (widest) -->
+      <rect x="80" y="60" width="840" height="90" fill="rgba(204,20,0,0.10)" stroke="#CC1400" stroke-width="2"/>
+      <text x="110" y="92" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212">第一層 — API 消費（推論時 tokens）</text>
+      <text x="110" y="115" font-family="Noto Sans JP" font-size="11" fill="#555555">OpenAI + Anthropic + Google + 全プロバイダー集約 (system prompt / RAG / 重複クエリ含む)</text>
+      <text x="110" y="135" font-family="Noto Sans JP" font-size="11" fill="#555555">verified — OpenAI 1.5B tok/min 公式</text>
+      <text x="890" y="100" font-family="Fira Code" font-size="22" font-weight="700" fill="#CC1400" text-anchor="end">1.5 × 10¹⁷</text>
+      <text x="890" y="125" font-family="Fira Code" font-size="12" fill="#CC1400" text-anchor="end">基準 × 1</text>
+      <text x="890" y="140" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="end">tokens / 年</text>
+
+      <!-- Layer 2: New unique text (narrower) -->
+      <rect x="180" y="170" width="640" height="80" fill="rgba(204,20,0,0.25)" stroke="#CC1400" stroke-width="2"/>
+      <text x="210" y="200" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212">第二層 — 新規生成 unique テキスト</text>
+      <text x="210" y="221" font-family="Noto Sans JP" font-size="11" fill="#555555">RAG / system prompt / 重複除外後、外部へ持続的に投稿された量</text>
+      <text x="210" y="238" font-family="Noto Sans JP" font-size="11" fill="#555555">estimated — Epoch AI モデルから逆算</text>
+      <text x="790" y="205" font-family="Fira Code" font-size="20" font-weight="700" fill="#CC1400" text-anchor="end">1.0 × 10¹⁵</text>
+      <text x="790" y="230" font-family="Fira Code" font-size="12" fill="#CC1400" text-anchor="end">÷ 150</text>
+      <text x="790" y="245" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="end">tokens / 年</text>
+
+      <!-- Layer 3: Cumulative human stock (narrowest) -->
+      <rect x="280" y="270" width="440" height="80" fill="rgba(204,20,0,0.45)" stroke="#CC1400" stroke-width="2"/>
+      <text x="310" y="300" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#FFFFFF">第三層 — 累積人類テキスト総量</text>
+      <text x="310" y="321" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF">文字発明 BC3200 から 2024 までの全質保証済みテキスト</text>
+      <text x="310" y="338" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF">verified — Epoch AI 2024 baseline (100T-1000T CI)</text>
+      <text x="690" y="305" font-family="Fira Code" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="end">3.0 × 10¹⁴</text>
+      <text x="690" y="330" font-family="Fira Code" font-size="12" fill="#FFFFFF" text-anchor="end">÷ 500</text>
+      <text x="690" y="345" font-family="Noto Sans JP" font-size="10" fill="#FFFFFF" text-anchor="end">tokens (累積)</text>
+
+      <!-- Insight area -->
+      <rect x="100" y="380" width="800" height="64" fill="#F7F7F5" stroke="#D9D9D9" stroke-width="1"/>
+      <text x="500" y="405" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#121212" text-anchor="middle">「1-20 京 tokens」という当初の数字は、第一層なら妥当、第二層なら過大、第三層と比較すれば 500 倍違う</text>
+      <text x="500" y="427" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">path-1 原則: 結論を 1 つに収束せず、層別固定で繋ぐ。HTP-DB Wave 4.5 修正の実装例。</text>
+    </svg>
+    <figcaption>FIG. 04 ── 三層スタック。出典: OpenAI State of Enterprise AI 2025 + Epoch AI 2024 + HTP-DB htp_source_discrepancies.ai_2025_api_vs_unique (gap_ratio=150)。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 05 ── 「人類超過」交差点の限定的妥当性
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 05 ── 交差点 2025</div>
+    <div class="fig-title">「人類超過」は文脈で結論が反転する</div>
+    <p class="fig-lead">新規 Web 記事フローでは AI が人類を超えた（2025-05 時点で 52%）。しかし累積ストックでは AI 15% : 人類 85% のまま。「交差点 2025」は限定的に妥当である。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">フロー vs ストック ── 同じ「2025」で結論が反転</text>
+
+      <!-- Left: New Web articles (flow) -->
+      <text x="250" y="60" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#121212" text-anchor="middle">新規 Web 記事フロー (2025-05)</text>
+      <text x="250" y="78" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">Graphite n=65,000 観測</text>
+
+      <rect x="120" y="95" width="260" height="280" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+      <rect x="120" y="95" width="260" height="145" fill="rgba(204,20,0,0.30)" stroke="#CC1400" stroke-width="1.5"/>
+      <rect x="120" y="240" width="260" height="135" fill="#555555" fill-opacity="0.20" stroke="#555555" stroke-width="1.5"/>
+
+      <text x="250" y="170" font-family="Fira Code" font-size="32" font-weight="700" fill="#CC1400" text-anchor="middle">AI 52%</text>
+      <text x="250" y="190" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">2026: 64% へ拡大予測</text>
+
+      <text x="250" y="315" font-family="Fira Code" font-size="32" font-weight="700" fill="#121212" text-anchor="middle">人類 48%</text>
+      <text x="250" y="335" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">MIT/Oxford 予測</text>
+
+      <text x="250" y="395" font-family="Noto Sans JP" font-size="11" font-weight="700" fill="#CC1400" text-anchor="middle">→ 超過済</text>
+
+      <!-- Right: Cumulative stock -->
+      <text x="750" y="60" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#121212" text-anchor="middle">累積テキストストック (2024)</text>
+      <text x="750" y="78" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">Epoch AI 300T tokens baseline</text>
+
+      <rect x="620" y="95" width="260" height="280" fill="none" stroke="#D9D9D9" stroke-width="1"/>
+      <rect x="620" y="95" width="260" height="42" fill="rgba(204,20,0,0.30)" stroke="#CC1400" stroke-width="1.5"/>
+      <rect x="620" y="137" width="260" height="238" fill="#555555" fill-opacity="0.20" stroke="#555555" stroke-width="1.5"/>
+
+      <text x="750" y="125" font-family="Fira Code" font-size="22" font-weight="700" fill="#CC1400" text-anchor="middle">AI 15%</text>
+
+      <text x="750" y="260" font-family="Fira Code" font-size="38" font-weight="700" fill="#121212" text-anchor="middle">人類 85%</text>
+      <text x="750" y="285" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">5,200 年の累積</text>
+
+      <text x="750" y="395" font-family="Noto Sans JP" font-size="11" font-weight="700" fill="#CC1400" text-anchor="middle">→ 未超過</text>
+
+      <!-- Arrow between with annotation -->
+      <path d="M 390 245 Q 500 130 610 245" fill="none" stroke="#CC1400" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#a5)"/>
+      <defs>
+        <marker id="a5" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L7,4.5 L0,9 z" fill="#CC1400"/>
+        </marker>
+      </defs>
+      <text x="500" y="125" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">文脈で結論が反転</text>
+    </svg>
+    <figcaption>FIG. 05 ── 出典: Graphite 2025 (n=65,000 articles) + MIT/Oxford projection + Epoch AI 2024。「人類超過」は限定的妥当性 (path-1 真実層実装)。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 06 ── 共生型テキスト生成の四様式
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 06 ── 四様式</div>
+    <div class="fig-title">AI と共生するテキスト生成の四様式</div>
+    <p class="fig-lead">印刷期の Aldine Press・Royal Society・Encyclopédie・Statute of Anne という四つの応答モデルに対応する、AI 時代の四つの共生様式。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">四つの共生様式 ── 印刷期 4 応答 ↔ AI 時代 4 様式</text>
+
+      <!-- A: 翻訳的編集型 -->
+      <rect x="60" y="60" width="430" height="180" fill="rgba(204,20,0,0.05)" stroke="#CC1400" stroke-width="2"/>
+      <text x="85" y="90" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#CC1400">様式 A — 翻訳的編集型</text>
+      <text x="85" y="113" font-family="Noto Sans JP" font-size="11" fill="#555555">印刷期: Aldine Press (1495)</text>
+      <text x="85" y="138" font-family="Noto Sans JP" font-size="12" fill="#121212">学術知見を日常的な動詞に翻訳する。</text>
+      <text x="85" y="158" font-family="Noto Sans JP" font-size="12" fill="#121212">AI は補助、編集判断は人間が握る。</text>
+      <text x="85" y="185" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">実装: 連載「〜のかたち」</text>
+      <text x="85" y="202" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">         esse-sense / kurashi-team</text>
+      <text x="85" y="220" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B">188 記事の編集 DNA</text>
+
+      <!-- B: 査読・認証型 -->
+      <rect x="510" y="60" width="430" height="180" fill="rgba(204,20,0,0.05)" stroke="#CC1400" stroke-width="2"/>
+      <text x="535" y="90" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#CC1400">様式 B — 査読・認証型</text>
+      <text x="535" y="113" font-family="Noto Sans JP" font-size="11" fill="#555555">印刷期: Royal Society (1660)</text>
+      <text x="535" y="138" font-family="Noto Sans JP" font-size="12" fill="#121212">生成と検証を別主体に分離する。</text>
+      <text x="535" y="158" font-family="Noto Sans JP" font-size="12" fill="#121212">verifiable provenance を価値の源泉に。</text>
+      <text x="535" y="185" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">実装: HTP-DB / GC-DB / 60+ DB</text>
+      <text x="535" y="202" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">         doc-verify / Sentinel veto</text>
+      <text x="535" y="220" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B">source_url_live_rate 100%</text>
+
+      <!-- C: 組織化・百科型 -->
+      <rect x="60" y="260" width="430" height="180" fill="rgba(204,20,0,0.05)" stroke="#CC1400" stroke-width="2"/>
+      <text x="85" y="290" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#CC1400">様式 C — 組織化・百科型</text>
+      <text x="85" y="313" font-family="Noto Sans JP" font-size="11" fill="#555555">印刷期: Encyclopédie (1751)</text>
+      <text x="85" y="338" font-family="Noto Sans JP" font-size="12" fill="#121212">大量の知を体系化し検索可能にする。</text>
+      <text x="85" y="358" font-family="Noto Sans JP" font-size="12" fill="#121212">cross_refs / authority_tier / path-1。</text>
+      <text x="85" y="385" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">実装: /db-master Tier 0</text>
+      <text x="85" y="402" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">         academic-oracle / KGH-DB</text>
+      <text x="85" y="420" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B">60+ DB の cross_refs 連結</text>
+
+      <!-- D: 帰属・所有型 -->
+      <rect x="510" y="260" width="430" height="180" fill="rgba(204,20,0,0.05)" stroke="#CC1400" stroke-width="2"/>
+      <text x="535" y="290" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#CC1400">様式 D — 帰属・所有型</text>
+      <text x="535" y="313" font-family="Noto Sans JP" font-size="11" fill="#555555">印刷期: Statute of Anne (1710)</text>
+      <text x="535" y="338" font-family="Noto Sans JP" font-size="12" fill="#121212">著者性と人間の責任を明示する。</text>
+      <text x="535" y="358" font-family="Noto Sans JP" font-size="12" fill="#121212">出自記録と Co-Authored-By。</text>
+      <text x="535" y="385" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">実装: git commit Co-Authored-By</text>
+      <text x="535" y="402" font-family="Noto Sans JP" font-size="10" font-weight="700" fill="#121212">         human-verified / 連載 author 明示</text>
+      <text x="535" y="420" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B">source_reliability 5 段階</text>
+    </svg>
+    <figcaption>FIG. 06 ── 四様式。印刷期は 369 年で構築されたが、AI 時代では 4 年で並行構築されている。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 07 ── 応答タイムライン圧縮
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 07 ── タイムライン圧縮</div>
+    <div class="fig-title">印刷期 vs AI 時代 ── 応答が 30-100 倍に高速化</div>
+    <p class="fig-lead">同じ位相の応答が、印刷期では 369 年、AI 時代では 5-30 年。商業応答・法的応答・国際協調応答のフェーズが、時間軸で圧縮される。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">応答タイムライン圧縮 ── 同じ位相が 30-100 倍速で展開</text>
+
+      <!-- Print era timeline (top) -->
+      <text x="40" y="65" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#121212">印刷期 (1454-1886) — 369 年</text>
+      <line x1="40" y1="100" x2="960" y2="100" stroke="#555555" stroke-width="1.5"/>
+
+      <!-- Print era events -->
+      <g>
+        <circle cx="60" cy="100" r="5" fill="#CC1400"/>
+        <text x="60" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1454</text>
+        <text x="60" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">活版</text>
+
+        <circle cx="170" cy="100" r="5" fill="#CC1400"/>
+        <text x="170" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1495</text>
+        <text x="170" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">Aldine</text>
+
+        <circle cx="240" cy="100" r="5" fill="#CC1400"/>
+        <text x="240" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1517</text>
+        <text x="240" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">宗教改革</text>
+
+        <circle cx="350" cy="100" r="5" fill="#CC1400"/>
+        <text x="350" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1559</text>
+        <text x="350" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">Index</text>
+
+        <circle cx="520" cy="100" r="5" fill="#CC1400"/>
+        <text x="520" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1660</text>
+        <text x="520" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">Royal Society</text>
+
+        <circle cx="680" cy="100" r="5" fill="#CC1400"/>
+        <text x="680" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1710</text>
+        <text x="680" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">Statute of Anne</text>
+
+        <circle cx="800" cy="100" r="5" fill="#CC1400"/>
+        <text x="800" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1751</text>
+        <text x="800" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">Encyclopédie</text>
+
+        <circle cx="940" cy="100" r="5" fill="#CC1400"/>
+        <text x="940" y="125" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">1886</text>
+        <text x="940" y="140" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">Berne</text>
+      </g>
+
+      <!-- Phase brackets -->
+      <g stroke="#555555" stroke-width="1" fill="none">
+        <path d="M 60 80 L 60 70 L 350 70 L 350 80"/>
+        <path d="M 350 80 L 350 70 L 680 70 L 680 80"/>
+        <path d="M 680 80 L 680 70 L 940 70 L 940 80"/>
+      </g>
+      <text x="205" y="60" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">第一波: 商業応答 (130 年)</text>
+      <text x="515" y="60" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">第二波: 政治・法的応答 (150 年)</text>
+      <text x="810" y="60" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">第三波: 国際協調 (160 年)</text>
+
+      <!-- Divider -->
+      <line x1="40" y1="200" x2="960" y2="200" stroke="#D9D9D9" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="500" y="220" font-family="Noto Sans JP" font-size="11" font-weight="700" fill="#CC1400" text-anchor="middle">▼ 30-100 倍に圧縮 ▼</text>
+
+      <!-- AI era timeline (bottom) -->
+      <text x="40" y="260" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#121212">AI 時代 (2022-) — 5-30 年予測 (現在進行中)</text>
+      <line x1="40" y1="300" x2="960" y2="300" stroke="#555555" stroke-width="1.5"/>
+
+      <g>
+        <circle cx="60" cy="300" r="5" fill="#121212"/>
+        <text x="60" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">2022</text>
+        <text x="60" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">ChatGPT</text>
+
+        <circle cx="150" cy="300" r="5" fill="#121212"/>
+        <text x="150" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">2023</text>
+        <text x="150" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">NYT 訴訟</text>
+
+        <circle cx="240" cy="300" r="5" fill="#121212"/>
+        <text x="240" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">2024</text>
+        <text x="240" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">EU AI Act</text>
+
+        <circle cx="340" cy="300" r="5" fill="#121212"/>
+        <text x="340" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">2024</text>
+        <text x="340" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">esse-sense型編集</text>
+
+        <circle cx="450" cy="300" r="5" fill="#121212"/>
+        <text x="450" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">2025</text>
+        <text x="450" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">Anthropic 和解</text>
+
+        <circle cx="580" cy="300" r="5" fill="#121212"/>
+        <text x="580" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">2026</text>
+        <text x="580" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">HTP-DB 構築</text>
+
+        <circle cx="720" cy="300" r="6" fill="#FFFFFF" stroke="#CC1400" stroke-width="2"/>
+        <text x="720" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">~2030</text>
+        <text x="720" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">peer-review 制度化</text>
+
+        <circle cx="860" cy="300" r="6" fill="#FFFFFF" stroke="#CC1400" stroke-width="2"/>
+        <text x="860" y="325" font-family="Fira Code" font-size="10" fill="#CC1400" text-anchor="middle">~2050</text>
+        <text x="860" y="340" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">国際 AI 条約</text>
+      </g>
+
+      <!-- Phase brackets AI era -->
+      <g stroke="#555555" stroke-width="1" fill="none">
+        <path d="M 60 280 L 60 270 L 340 270 L 340 280"/>
+        <path d="M 340 280 L 340 270 L 580 270 L 580 280"/>
+        <path d="M 580 280 L 580 270 L 860 270 L 860 280"/>
+      </g>
+      <text x="200" y="262" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">第一波: 商業+市民応答 (3 年)</text>
+      <text x="460" y="262" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">第二波: 法的応答 (~5 年)</text>
+      <text x="720" y="262" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">第三波: 国際協調 (~25 年予測)</text>
+
+      <!-- Compression ratio -->
+      <text x="500" y="380" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">商業応答 (印刷 41 年 → AI 2 年): 圧縮率 20 倍</text>
+      <text x="500" y="400" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">著作権応答 (印刷 260 年 → AI 1 年): 圧縮率 260 倍</text>
+      <text x="500" y="420" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">国際協調 (印刷 432 年 → AI 8-25 年予測): 圧縮率 20-50 倍</text>
+
+      <text x="500" y="450" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">出典: SI Framework knowledge_democracy + 訴訟記録 + EU AI Act + Anthropic Settlement 2025</text>
+    </svg>
+    <figcaption>FIG. 07 ── タイムライン比較。印刷期 369 年の応答が、AI 時代では 5-30 年に圧縮されつつある。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 08 ── 三事象の主結合先変遷
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 08 ── 結合先の変遷</div>
+    <div class="fig-title">中央集権 → 市民社会 → 商業独占 → 三層合成</div>
+    <p class="fig-lead">同じ希少化パターンが繰り返されるが、希少資源を制度化する相手は事象ごとに変化する。AI 時代は三つすべての合成として展開している。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">結合先の変遷 ── 希少化がどの制度と結合するか</text>
+
+      <!-- Four events as columns with bars -->
+      <g>
+        <!-- Event 1: 文字誕生 -->
+        <text x="125" y="60" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#121212" text-anchor="middle">文字誕生 (BC3300)</text>
+        <text x="125" y="78" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">シュメール</text>
+        <rect x="50" y="100" width="150" height="260" fill="rgba(204,20,0,0.55)" stroke="#CC1400" stroke-width="2"/>
+        <text x="125" y="200" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">中央集権</text>
+        <text x="125" y="223" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF" text-anchor="middle">95%</text>
+        <text x="125" y="248" font-family="Noto Sans JP" font-size="10" fill="#FFFFFF" text-anchor="middle">神権・王権・帝国</text>
+        <rect x="50" y="360" width="150" height="20" fill="rgba(85,85,85,0.30)" stroke="#555555" stroke-width="1"/>
+        <text x="125" y="395" font-family="Noto Sans JP" font-size="9" fill="#555555" text-anchor="middle">市民 ~5%</text>
+
+        <!-- Event 2: 印刷革命 -->
+        <text x="325" y="60" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#121212" text-anchor="middle">印刷革命 (1454)</text>
+        <text x="325" y="78" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">欧州</text>
+        <rect x="250" y="100" width="150" height="50" fill="rgba(85,85,85,0.30)" stroke="#555555" stroke-width="1"/>
+        <text x="325" y="130" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">中央 ~20%</text>
+        <rect x="250" y="150" width="150" height="180" fill="rgba(204,20,0,0.45)" stroke="#CC1400" stroke-width="2"/>
+        <text x="325" y="225" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">市民社会</text>
+        <text x="325" y="248" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF" text-anchor="middle">70%</text>
+        <text x="325" y="273" font-family="Noto Sans JP" font-size="10" fill="#FFFFFF" text-anchor="middle">Aldine / Royal Soc / Encyclo</text>
+        <rect x="250" y="330" width="150" height="50" fill="rgba(85,85,85,0.20)" stroke="#555555" stroke-width="1"/>
+        <text x="325" y="358" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">商業 ~10%</text>
+
+        <!-- Event 3: デジタル誕生 -->
+        <text x="525" y="60" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#121212" text-anchor="middle">デジタル誕生 (1986)</text>
+        <text x="525" y="78" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">グローバル</text>
+        <rect x="450" y="100" width="150" height="30" fill="rgba(85,85,85,0.20)" stroke="#555555" stroke-width="1"/>
+        <text x="525" y="120" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">中央 ~10%</text>
+        <rect x="450" y="130" width="150" height="80" fill="rgba(85,85,85,0.30)" stroke="#555555" stroke-width="1"/>
+        <text x="525" y="175" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">市民 ~25%</text>
+        <text x="525" y="190" font-family="Noto Sans JP" font-size="9" fill="#555555" text-anchor="middle">Wikipedia / IA</text>
+        <rect x="450" y="210" width="150" height="170" fill="rgba(204,20,0,0.55)" stroke="#CC1400" stroke-width="2"/>
+        <text x="525" y="290" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">商業独占</text>
+        <text x="525" y="313" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF" text-anchor="middle">65%</text>
+        <text x="525" y="338" font-family="Noto Sans JP" font-size="10" fill="#FFFFFF" text-anchor="middle">GAFA / プラットフォーム</text>
+
+        <!-- Event 4: AI 時代 -->
+        <text x="775" y="60" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#121212" text-anchor="middle">AI 時代 (2022-)</text>
+        <text x="775" y="78" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">三層合成</text>
+        <rect x="700" y="100" width="150" height="95" fill="rgba(85,85,85,0.40)" stroke="#555555" stroke-width="2"/>
+        <text x="775" y="142" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">中央集権</text>
+        <text x="775" y="160" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF" text-anchor="middle">35%</text>
+        <text x="775" y="180" font-family="Noto Sans JP" font-size="10" fill="#FFFFFF" text-anchor="middle">米中 AI 国家戦略</text>
+        <rect x="700" y="195" width="150" height="95" fill="rgba(204,20,0,0.40)" stroke="#CC1400" stroke-width="2"/>
+        <text x="775" y="237" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">市民社会</text>
+        <text x="775" y="255" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF" text-anchor="middle">30%</text>
+        <text x="775" y="275" font-family="Noto Sans JP" font-size="10" fill="#FFFFFF" text-anchor="middle">esse-sense / OSS LLM</text>
+        <rect x="700" y="290" width="150" height="90" fill="rgba(204,20,0,0.60)" stroke="#CC1400" stroke-width="2"/>
+        <text x="775" y="330" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#FFFFFF" text-anchor="middle">商業独占</text>
+        <text x="775" y="348" font-family="Noto Sans JP" font-size="11" fill="#FFFFFF" text-anchor="middle">35%</text>
+        <text x="775" y="368" font-family="Noto Sans JP" font-size="10" fill="#FFFFFF" text-anchor="middle">OpenAI / Anthropic / G</text>
+      </g>
+
+      <!-- Arrows -->
+      <g stroke="#CC1400" stroke-width="1.5" fill="none">
+        <path d="M 205 220 L 245 220" marker-end="url(#a8)"/>
+        <path d="M 405 220 L 445 220" marker-end="url(#a8)"/>
+        <path d="M 605 220 L 695 220" marker-end="url(#a8)"/>
+      </g>
+      <defs>
+        <marker id="a8" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L6,4 L0,8 z" fill="#CC1400"/>
+        </marker>
+      </defs>
+
+      <!-- Insight -->
+      <text x="500" y="425" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">同じ希少化パターンが結合する相手は事象ごとに変わる</text>
+      <text x="500" y="445" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">ミラツクは AI 時代の「市民社会層」に位置取る ── 印刷期の系譜にある</text>
+    </svg>
+    <figcaption>FIG. 08 ── 結合先の変遷。比率は HTP-DB + SI Framework + 印刷史古典からの定性的推定。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 09 ── 8 軸 × 4 事象マトリクス
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 09 ── 8 × 4 マトリクス</div>
+    <div class="fig-title">希少化の 8 軸 × 4 事象 ── 法則性の確認</div>
+    <p class="fig-lead">8 軸すべてで希少化が確認されるという法則性。だが具体的な装置は時代で変わる。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 540" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">8 軸 × 4 事象マトリクス ── 同じ位相が三度繰り返される</text>
+
+      <!-- column headers -->
+      <g font-family="Noto Sans JP" font-size="11" font-weight="700" fill="#CC1400">
+        <text x="40" y="60">希少化の軸</text>
+        <text x="220" y="60">文字誕生</text>
+        <text x="420" y="60">印刷革命</text>
+        <text x="620" y="60">デジタル</text>
+        <text x="820" y="60">AI 時代</text>
+      </g>
+      <g font-family="Fira Code" font-size="10" fill="#CC1400">
+        <text x="220" y="76">BC3300</text>
+        <text x="420" y="76">1454</text>
+        <text x="620" y="76">1986</text>
+        <text x="820" y="76">2022</text>
+      </g>
+      <line x1="20" y1="82" x2="980" y2="82" stroke="#CC1400" stroke-width="1.5"/>
+
+      <!-- rows: 8 axes -->
+      <g font-family="Noto Sans JP" font-size="11" fill="#121212">
+        <text x="40" y="108" font-weight="700">編集判断</text>
+        <text x="220" y="108" fill="#555555">書記階級独占</text>
+        <text x="420" y="108" fill="#555555">Aldine 商業化</text>
+        <text x="620" y="108" fill="#555555">部分的解体</text>
+        <text x="820" y="108" font-weight="700" fill="#CC1400">人間に再凝縮</text>
+        <line x1="20" y1="118" x2="980" y2="118" stroke="#EEEEEE"/>
+
+        <text x="40" y="138" font-weight="700">権威認証</text>
+        <text x="220" y="138" fill="#555555">神権・王権独占</text>
+        <text x="420" y="138" fill="#555555">Royal Society 査読</text>
+        <text x="620" y="138" fill="#555555">Wikipedia 出典</text>
+        <text x="820" y="138" font-weight="700" fill="#CC1400">provenance hash</text>
+        <line x1="20" y1="148" x2="980" y2="148" stroke="#EEEEEE"/>
+
+        <text x="40" y="168" font-weight="700">curation</text>
+        <text x="220" y="168" fill="#555555">王立図書館</text>
+        <text x="420" y="168" fill="#555555">Bodleian 公共化</text>
+        <text x="620" y="168" fill="#555555">Google 検索</text>
+        <text x="820" y="168" font-weight="700" fill="#CC1400">非西洋 curation</text>
+        <line x1="20" y1="178" x2="980" y2="178" stroke="#EEEEEE"/>
+
+        <text x="40" y="198" font-weight="700">親密性</text>
+        <text x="220" y="198" fill="#555555">対面伝承</text>
+        <text x="420" y="198" fill="#555555">書簡文化</text>
+        <text x="620" y="198" fill="#555555">対面回帰 (Turkle)</text>
+        <text x="820" y="198" font-weight="700" fill="#CC1400">フィールドワーク</text>
+        <line x1="20" y1="208" x2="980" y2="208" stroke="#EEEEEE"/>
+
+        <text x="40" y="228" font-weight="700">注意</text>
+        <text x="220" y="228" fill="#555555">場の同時性</text>
+        <text x="420" y="228" fill="#555555">沈黙の文学</text>
+        <text x="620" y="228" fill="#555555">attention economy</text>
+        <text x="820" y="228" font-weight="700" fill="#CC1400">選ばない判断</text>
+        <line x1="20" y1="238" x2="980" y2="238" stroke="#EEEEEE"/>
+
+        <text x="40" y="258" font-weight="700">著者性</text>
+        <text x="220" y="258" fill="#555555">匿名・集合</text>
+        <text x="420" y="258" fill="#555555">Statute of Anne</text>
+        <text x="620" y="258" fill="#555555">CC ライセンス</text>
+        <text x="820" y="258" font-weight="700" fill="#CC1400">human-verified</text>
+        <line x1="20" y1="268" x2="980" y2="268" stroke="#EEEEEE"/>
+
+        <text x="40" y="288" font-weight="700">記憶</text>
+        <text x="220" y="288" fill="#555555">暗誦の陳腐化</text>
+        <text x="420" y="288" fill="#555555">蔵書印</text>
+        <text x="620" y="288" fill="#555555">Internet Archive</text>
+        <text x="820" y="288" font-weight="700" fill="#CC1400">学術 DB 群</text>
+        <line x1="20" y1="298" x2="980" y2="298" stroke="#EEEEEE"/>
+
+        <text x="40" y="318" font-weight="700">プライバシー</text>
+        <text x="220" y="318" fill="#555555">未分化</text>
+        <text x="420" y="318" fill="#555555">書簡の私性</text>
+        <text x="620" y="318" fill="#555555">GDPR (2018)</text>
+        <text x="820" y="318" font-weight="700" fill="#CC1400">AI 出力からの保護</text>
+      </g>
+
+      <line x1="20" y1="340" x2="980" y2="340" stroke="#CC1400" stroke-width="1.5"/>
+
+      <!-- summary rows -->
+      <g font-family="Noto Sans JP" font-size="11">
+        <text x="40" y="368" font-weight="700" fill="#121212">主結合先</text>
+        <text x="220" y="368" fill="#CC1400" font-weight="700">中央集権</text>
+        <text x="420" y="368" fill="#CC1400" font-weight="700">市民社会</text>
+        <text x="620" y="368" fill="#CC1400" font-weight="700">商業独占</text>
+        <text x="820" y="368" fill="#CC1400" font-weight="700">三層合成</text>
+
+        <text x="40" y="395" font-weight="700" fill="#121212">応答完成期間</text>
+        <text x="220" y="395" fill="#555555">3,000+ 年</text>
+        <text x="420" y="395" fill="#555555">369 年</text>
+        <text x="620" y="395" fill="#555555">25-50 年</text>
+        <text x="820" y="395" fill="#555555">予測 5-30 年</text>
+
+        <text x="40" y="422" font-weight="700" fill="#121212">代表ソース</text>
+        <text x="220" y="422" fill="#6B6B6B">CDLI / Havelock</text>
+        <text x="420" y="422" fill="#6B6B6B">Buringh / Eisenstein</text>
+        <text x="620" y="422" fill="#6B6B6B">Hilbert-Lopez / IDC</text>
+        <text x="820" y="422" fill="#6B6B6B">Epoch AI / Graphite</text>
+      </g>
+
+      <line x1="20" y1="445" x2="980" y2="445" stroke="#CC1400" stroke-width="1.5"/>
+
+      <!-- Bottom finding -->
+      <text x="500" y="480" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#CC1400" text-anchor="middle">8 軸すべてで希少化が確認される ── 偶然ではなく構造的法則</text>
+      <text x="500" y="505" font-family="Noto Sans JP" font-size="12" fill="#121212" text-anchor="middle">情報量が爆発するとき、希少化するのは「情報そのもの」ではなく「情報を選び・編み・保証する仕事」である</text>
+      <text x="500" y="528" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">同じ位相が 5,200 年を隔てて三度繰り返される</text>
+    </svg>
+    <figcaption>FIG. 09 ── 比較マトリクス全景。出典: HTP-DB + SI Framework + 印刷史古典 + 文字誕生研究 (Havelock 1963 / Ong 1982) + デジタル史 (Hilbert-Lopez 2011)。</figcaption>
+  </figure>
+</div>
+
+<!-- ============================================================
+     FIG 10 ── ミラツク事業の位置取り
+============================================================ -->
+<div class="fig-block">
+  <div class="fig-header">
+    <div class="fig-num">FIG. 10 ── 位置取り</div>
+    <div class="fig-title">ミラツクは AI 時代の「市民社会層」に位置する</div>
+    <p class="fig-lead">60+ DB・12 連載・Sentinel・doc-verify・FVCP ── ミラツクの仕事は構造的に Aldine Press や Royal Society の現代版である。</p>
+  </div>
+  <figure>
+    <svg viewBox="0 0 1000 540" xmlns="http://www.w3.org/2000/svg">
+      <text x="500" y="22" font-family="Noto Sans JP" font-size="14" font-weight="700" fill="#121212" text-anchor="middle">ミラツクの 60+ DB + 12 連載 + 認証体系のマップ</text>
+
+      <!-- Central circle: ミラツク -->
+      <circle cx="500" cy="280" r="70" fill="rgba(204,20,0,0.10)" stroke="#CC1400" stroke-width="2"/>
+      <text x="500" y="270" font-family="Noto Sans JP" font-size="13" font-weight="700" fill="#CC1400" text-anchor="middle">ミラツク</text>
+      <text x="500" y="290" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">市民社会層</text>
+      <text x="500" y="308" font-family="Noto Sans JP" font-size="10" fill="#555555" text-anchor="middle">第三セクター</text>
+
+      <!-- Four quadrants representing 4 styles -->
+      <!-- A: 翻訳的編集 (top-left) -->
+      <g>
+        <rect x="100" y="80" width="280" height="140" fill="rgba(204,20,0,0.04)" stroke="#CC1400" stroke-width="1.5"/>
+        <text x="240" y="105" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">様式 A: 翻訳的編集</text>
+        <text x="240" y="122" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">↔ Aldine Press (1495)</text>
+        <text x="240" y="148" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">連載「〜のかたち」シリーズ</text>
+        <text x="240" y="165" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">esse-sense 188 記事</text>
+        <text x="240" y="182" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">kurashi / jigyo / keiei / itonami</text>
+        <text x="240" y="199" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">henka / Futures / Futures II</text>
+        <path d="M 380 220 L 440 270" stroke="#CC1400" stroke-width="1.5" fill="none"/>
+      </g>
+
+      <!-- B: 査読・認証 (top-right) -->
+      <g>
+        <rect x="620" y="80" width="280" height="140" fill="rgba(204,20,0,0.04)" stroke="#CC1400" stroke-width="1.5"/>
+        <text x="760" y="105" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">様式 B: 査読・認証</text>
+        <text x="760" y="122" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">↔ Royal Society (1660)</text>
+        <text x="760" y="148" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">doc-verify エージェント</text>
+        <text x="760" y="165" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">Sentinel veto 体制</text>
+        <text x="760" y="182" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">source_url_live 100%</text>
+        <text x="760" y="199" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">gta_status 4 値 / path-1</text>
+        <path d="M 620 220 L 560 270" stroke="#CC1400" stroke-width="1.5" fill="none"/>
+      </g>
+
+      <!-- C: 組織化・百科 (bottom-left) -->
+      <g>
+        <rect x="100" y="340" width="280" height="140" fill="rgba(204,20,0,0.04)" stroke="#CC1400" stroke-width="1.5"/>
+        <text x="240" y="365" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">様式 C: 組織化・百科</text>
+        <text x="240" y="382" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">↔ Encyclopédie (1751)</text>
+        <text x="240" y="408" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">/db-master Tier 0</text>
+        <text x="240" y="425" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">academic-oracle / 60+ DB</text>
+        <text x="240" y="442" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">HTP-DB / GC-DB / KGH-DB</text>
+        <text x="240" y="459" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">cross_refs 連結インフラ</text>
+        <path d="M 380 340 L 440 290" stroke="#CC1400" stroke-width="1.5" fill="none"/>
+      </g>
+
+      <!-- D: 帰属・所有 (bottom-right) -->
+      <g>
+        <rect x="620" y="340" width="280" height="140" fill="rgba(204,20,0,0.04)" stroke="#CC1400" stroke-width="1.5"/>
+        <text x="760" y="365" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">様式 D: 帰属・所有</text>
+        <text x="760" y="382" font-family="Noto Sans JP" font-size="10" fill="#6B6B6B" text-anchor="middle">↔ Statute of Anne (1710)</text>
+        <text x="760" y="408" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">git commit Co-Authored-By</text>
+        <text x="760" y="425" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">human-verified flag</text>
+        <text x="760" y="442" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">source_reliability 5 段階</text>
+        <text x="760" y="459" font-family="Noto Sans JP" font-size="11" fill="#121212" text-anchor="middle">連載 author 明示</text>
+        <path d="M 620 340 L 560 290" stroke="#CC1400" stroke-width="1.5" fill="none"/>
+      </g>
+
+      <!-- Bottom statement -->
+      <text x="500" y="510" font-family="Noto Sans JP" font-size="12" font-weight="700" fill="#CC1400" text-anchor="middle">ミラツクの仕事は一企業の判断ではなく、人類の量爆発応答の系譜の一部である</text>
+      <text x="500" y="530" font-family="Noto Sans JP" font-size="11" fill="#555555" text-anchor="middle">Aldine Press から 530 年、Royal Society から 366 年 ── 同じ位相の応答が現代に再構築されている</text>
+    </svg>
+    <figcaption>FIG. 10 ── ミラツクの位置取り。60+ DB / 12 連載 / Sentinel / FVCP の構造は印刷期 4 応答モデルの現代版実装である。</figcaption>
+  </figure>
+</div>
+
+</div>
+
+<footer class="doc-footer">
+<p><strong>四つの量爆発と希少化の系譜 ── 図解版</strong></p>
+<p>著者: 西村勇也（NPO法人ミラツク）+ Claude Opus 4.7（1M context）</p>
+<p>作成: 2026-05-16 / 姉妹文書: <a href="report.html">report.html</a> + <a href="scarcity.html">scarcity.html</a> + <a href="transitions.html">transitions.html</a></p>
+<p>参照 DB: HTP-DB (47 records) / SI-Framework (1,096 events) / CDH / GC-DB</p>
+<p><a href="index.html">DASHBOARD</a> · <a href="https://github.com/yuyanishimura0312/htp-db" target="_blank">GITHUB</a></p>
+</footer>
+
+<script>
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('htp-theme', next);
+}
+const saved = localStorage.getItem('htp-theme');
+if (saved) {
+  document.documentElement.setAttribute('data-theme', saved);
+}
+</script>
+</body>
+</html>
